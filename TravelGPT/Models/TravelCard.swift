@@ -19,6 +19,7 @@ struct TravelCard: Identifiable, Codable {
     let rarity: String?
     let collection_tags: [String]?
     let category: String?
+    let isVerified: Bool
     var checkInPhotos: [CheckInPhoto] = []
     
     var formattedDate: String {

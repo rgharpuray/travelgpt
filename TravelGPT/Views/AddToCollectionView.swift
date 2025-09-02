@@ -272,7 +272,7 @@ struct CreateCollectionView: View {
         owner_destination_name: "Paris",
         rarity: "rare",
         collection_tags: ["European Adventures"],
-        category: "Activities"
+        category: "Activities", isVerified: false
     ))
 }
 

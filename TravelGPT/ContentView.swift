@@ -8,6 +8,33 @@
 import SwiftUI
 import PhotosUI
 
+extension Color {
+    init(hex: String) {
+        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        var int: UInt64 = 0
+        Scanner(string: hex).scanHexInt64(&int)
+        let a, r, g, b: UInt64
+        switch hex.count {
+        case 3: // RGB (12-bit)
+            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
+        case 6: // RGB (24-bit)
+            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
+        case 8: // ARGB (32-bit)
+            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
+        default:
+            (a, r, g, b) = (1, 1, 1, 0)
+        }
+
+        self.init(
+            .sRGB,
+            red: Double(r) / 255,
+            green: Double(g) / 255,
+            blue:  Double(b) / 255,
+            opacity: Double(a) / 255
+        )
+    }
+}
+
 struct ContentView: View {
     @StateObject private var cardStore = CardStore()
     @StateObject private var authService = AuthService.shared
@@ -27,145 +54,152 @@ struct ContentView: View {
     @State private var cardCreationErrorMessage: String? = nil
     @State private var showMapView = false
     @State private var showLocationPicker = false
-    @State private var currentLocation = "Rome, Italy"
+    @State private var currentLocation = "Barcelona, Spain"
     @State private var selectedCategory = "All"
     @State private var selectedMood: TravelMood? = nil
     @State private var searchText = ""
     @State private var showAddCardSheet = false
+    @State private var showCardCreationForm = false
     
     // Sample cards with categories for filtering
     private let sampleCards = [
         TravelCard(
             id: 1,
-            destination_name: "Akihabara, Tokyo",
-            image_url: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&h=600&fit=crop",
+            destination_name: "Montserrat, Barcelona",
+            image_url: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop",
             is_valid_destination: true,
-            thought: "Akihabara is like if someone took all the anime and gaming dreams I had as a kid and turned them into a real place. The neon lights are so bright, I'm pretty sure they can see them from space.",
+            thought: "Great hike up to the monastery. The views of Catalonia from the top are impressive - you can see all the way to the Mediterranean.",
             created_at: "2025-01-15T10:30:00Z",
             updated_at: nil,
-            like_count: 42,
+            like_count: 89,
             is_liked: false,
             is_owner: true,
             is_intrusive_mode: false,
-            device_destination_name: "Akihabara",
-            owner_destination_name: "Akihabara",
-            rarity: "rare",
-            collection_tags: ["Tokyo Adventures"],
+            device_destination_name: "Montserrat",
+            owner_destination_name: "Montserrat",
+            rarity: "epic",
+            collection_tags: ["Barcelona Mountains"],
             category: "Activities",
+            isVerified: true,
             checkInPhotos: [
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400", userName: "Alex", caption: "Amazing anime vibes!"),
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Sarah", caption: "Found the perfect figurine"),
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=400", userName: "Mike", caption: "Gaming paradise!")
+                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400", userName: "Carlos", caption: "Incredible hike to the top!"),
+                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Maria", caption: "The monastery is magical"),
+                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=400", userName: "Javier", caption: "Best views in Catalonia!")
             ]
         ),
         TravelCard(
             id: 2,
-            destination_name: "Fushimi Inari, Kyoto",
-            image_url: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800&h=600&fit=crop",
+            destination_name: "Montjuïc Olympic Stadium '92",
+            image_url: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
             is_valid_destination: true,
-            thought: "Walking through thousands of torii gates felt like being in a real-life video game level. I half expected to find a save point or power-up around every corner.",
+            thought: "Standing in the Olympic Stadium where the '92 Games happened is impressive. You can feel the Olympic spirit that transformed Barcelona.",
             created_at: "2025-01-14T15:45:00Z",
             updated_at: nil,
-            like_count: 28,
+            like_count: 156,
             is_liked: true,
             is_owner: false,
             is_intrusive_mode: false,
-            device_destination_name: "Fushimi Inari",
-            owner_destination_name: "Fushimi Inari",
-            rarity: "common",
-            collection_tags: ["Kyoto Temples"],
+            device_destination_name: "Montjuïc Olympic Stadium",
+            owner_destination_name: "Montjuïc Olympic Stadium",
+            rarity: "legendary",
+            collection_tags: ["Barcelona Olympics"],
             category: "Activities",
+            isVerified: true,
             checkInPhotos: [
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Emma", caption: "Peaceful morning walk"),
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400", userName: "David", caption: "Magical atmosphere")
+                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Ana", caption: "Olympic history right here!"),
+                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400", userName: "Pablo", caption: "The stadium is massive")
             ]
         ),
         TravelCard(
             id: 3,
-            destination_name: "Shibuya Crossing, Tokyo",
-            image_url: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=800&h=600&fit=crop",
+            destination_name: "La Tomatina Festival, Buñol",
+            image_url: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&h=600&fit=crop",
             is_valid_destination: true,
-            thought: "This crossing is so chaotic and beautiful, it's like watching a perfectly choreographed dance where everyone forgot the routine but somehow it still works.",
+            thought: "The world's biggest food fight is as chaotic and fun as it sounds. Getting pelted with tomatoes while thousands of people laugh and dance - it's pure Spanish fun.",
             created_at: "2025-01-13T19:20:00Z",
             updated_at: nil,
-            like_count: 67,
+            like_count: 234,
             is_liked: false,
             is_owner: false,
             is_intrusive_mode: true,
-            device_destination_name: "Shibuya Crossing",
-            owner_destination_name: "Shibuya Crossing",
+            device_destination_name: "La Tomatina",
+            owner_destination_name: "La Tomatina",
             rarity: "legendary",
-            collection_tags: ["Tokyo Life"],
+            collection_tags: ["Spanish Festivals"],
             category: "Activities",
+            isVerified: true,
             checkInPhotos: [
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=400", userName: "Lisa", caption: "The energy here is incredible!"),
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Tom", caption: "Perfect spot for people watching")
+                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=400", userName: "Sofia", caption: "Most fun I've ever had!"),
+                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Diego", caption: "Tomato stains everywhere!")
             ]
         ),
         TravelCard(
             id: 4,
-            destination_name: "Sukiyabashi Jiro, Tokyo",
-            image_url: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=800&h=600&fit=crop",
+            destination_name: "Sagrada Familia, Barcelona",
+            image_url: "https://images.unsplash.com/photo-1589308078059-be1415eab4c3?w=800&h=600&fit=crop",
             is_valid_destination: true,
-            thought: "Legendary sushi restaurant that inspired Jiro Dreams of Sushi. Reservations required months in advance, but worth every yen!",
+            thought: "Gaudí's masterpiece is impressive. The stained glass creates a beautiful cathedral effect that makes you feel like you're inside a living work of art.",
             created_at: "2025-01-12T18:00:00Z",
             updated_at: nil,
-            like_count: 203,
+            like_count: 312,
             is_liked: true,
             is_owner: false,
             is_intrusive_mode: false,
-            device_destination_name: "Sukiyabashi Jiro",
-            owner_destination_name: "Sukiyabashi Jiro",
+            device_destination_name: "Sagrada Familia",
+            owner_destination_name: "Sagrada Familia",
             rarity: "legendary",
-            collection_tags: ["Tokyo Food"],
-            category: "Restaurants",
+            collection_tags: ["Barcelona Architecture"],
+            category: "Museums",
+            isVerified: true,
             checkInPhotos: [
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400", userName: "Chef Ken", caption: "Once in a lifetime experience"),
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Foodie Anna", caption: "Worth every penny!")
+                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400", userName: "Elena", caption: "The light inside is magical"),
+                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Miguel", caption: "Gaudí was a genius!")
             ]
         ),
         TravelCard(
             id: 5,
-            destination_name: "Tokyo National Museum",
-            image_url: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=800&h=600&fit=crop",
+            destination_name: "La Boqueria Market, Barcelona",
+            image_url: "https://lp-cms-production.imgix.net/2025-02/shutterstock1238252371.jpg?auto=format,compress&q=72&w=1440&h=810&fit=crop",
             is_valid_destination: true,
-            thought: "Japan's oldest and largest museum houses over 110,000 artifacts. The samurai armor collection is absolutely breathtaking!",
+            thought: "This market is great for food lovers. Fresh seafood, colorful fruits, and the best jamón ibérico. The energy and smells make you want to try everything.",
             created_at: "2025-01-11T14:30:00Z",
             updated_at: nil,
-            like_count: 67,
+            like_count: 178,
             is_liked: false,
             is_owner: false,
             is_intrusive_mode: false,
-            device_destination_name: "Tokyo National Museum",
-            owner_destination_name: "Tokyo National Museum",
+            device_destination_name: "La Boqueria",
+            owner_destination_name: "La Boqueria",
             rarity: "rare",
-            collection_tags: ["Tokyo Culture"],
-            category: "Museums",
+            collection_tags: ["Barcelona Food"],
+            category: "Restaurants",
+            isVerified: true,
             checkInPhotos: [
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "History Buff", caption: "The samurai armor is incredible"),
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400", userName: "Art Lover", caption: "So many beautiful artifacts")
+                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Carmen", caption: "Best tapas in the city!"),
+                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400", userName: "Luis", caption: "Fresh seafood everywhere")
             ]
         ),
         TravelCard(
             id: 6,
-            destination_name: "Tsukiji Outer Market",
-            image_url: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&h=600&fit=crop",
+            destination_name: "Park Güell, Barcelona",
+            image_url: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop",
             is_valid_destination: true,
-            thought: "The outer market is still bustling with food stalls and restaurants. Try the fresh sushi and tamago (egg) dishes!",
+            thought: "Walking through Park Güell feels like stepping into a fairy tale. The mosaic benches, dragon fountain, and whimsical architecture are impressive.",
             created_at: "2025-01-10T12:00:00Z",
             updated_at: nil,
-            like_count: 134,
+            like_count: 245,
             is_liked: true,
             is_owner: false,
             is_intrusive_mode: false,
-            device_destination_name: "Tsukiji Outer Market",
-            owner_destination_name: "Tsukiji Outer Market",
-            rarity: "common",
-            collection_tags: ["Tokyo Food"],
-            category: "Restaurants",
+            device_destination_name: "Park Güell",
+            owner_destination_name: "Park Güell",
+            rarity: "epic",
+            collection_tags: ["Barcelona Parks"],
+            category: "Activities",
+            isVerified: true,
             checkInPhotos: [
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400", userName: "Sushi Master", caption: "Fresh fish every morning"),
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400", userName: "Market Explorer", caption: "Best breakfast in Tokyo!")
+                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400", userName: "Isabella", caption: "The mosaics are incredible"),
+                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400", userName: "Roberto", caption: "Perfect for photos!")
             ]
         )
     ]
@@ -229,128 +263,118 @@ struct ContentView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                // Top bar with add card, location, and category
-                HStack(spacing: 16) {
-                    // Add card button
-                    Button(action: {
-                        showAddCardSheet = true
-                    }) {
-                        VStack(spacing: 2) {
-                            Image(systemName: "plus.circle.fill")
-                                .resizable()
-                                .scaledToFit()
-                                .frame(width: 28, height: 28)
-                            
-                            Text(selectedCategory == "All" ? "Add Card" : "Add \(selectedCategory)")
-                                .font(.caption)
-                                .fontWeight(.bold)
-                        }
-                        .foregroundColor(.white)
-                        .padding()
-                        .frame(width: 80, height: 80)
-                        .background(Color.blue)
-                        .clipShape(Circle())
-                        .shadow(radius: 8)
-                    }
-                    
-                    // Location display
-                    VStack(alignment: .leading, spacing: 4) {
-                        HStack(spacing: 6) {
+                // Top bar with location and category - Unified pill design
+                HStack(spacing: 0) {
+                    // Location + Category unified pill
+                    HStack(spacing: 0) {
+                        // Location section
+                        Button(action: {
+                            showLocationPicker = true
+                        }) {
+                                                    HStack(spacing: 8) {
                             Image(systemName: "mappin.circle.fill")
-                                .foregroundColor(.red)
+                                .foregroundColor(.black)
                                 .font(.title3)
+                            
                             Text(currentLocation)
-                                .font(.headline)
-                                .fontWeight(.semibold)
+                                .font(.subheadline)
+                                .fontWeight(.medium)
                                 .foregroundColor(.primary)
                         }
-                        
-                        Text("Tap to change location")
-                            .font(.caption)
-                            .foregroundColor(.secondary)
-                    }
-                    .padding(.horizontal, 16)
-                    .padding(.vertical, 12)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(12)
-                    .onTapGesture {
-                        showLocationPicker = true
-                    }
-                    
-                    // Category selector
-                    VStack(spacing: 4) {
-                        Text("Show:")
-                            .font(.caption2)
-                            .foregroundColor(.secondary)
-                        
-                        Picker("Category", selection: $selectedCategory) {
-                            Text("All").tag("All")
-                            Text("Restaurants").tag("Restaurants")
-                            Text("Activities").tag("Activities")
-                            Text("Museums").tag("Museums")
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
                         }
-                        .pickerStyle(MenuPickerStyle())
-                        .font(.caption)
-                        .fontWeight(.medium)
+                        .buttonStyle(PlainButtonStyle())
+                        
+                        // Divider
+                        Rectangle()
+                            .fill(Color(.systemGray4))
+                            .frame(width: 1, height: 24)
+                        
+                        // Category selector
+                        Menu {
+                            ForEach(["All", "Restaurants", "Activities", "Museums"], id: \.self) { category in
+                                Button(action: {
+                                    selectedCategory = category
+                                }) {
+                                    HStack {
+                                        Text(category)
+                                        if selectedCategory == category {
+                                            Image(systemName: "checkmark")
+                                                .foregroundColor(Color(red: 0.85, green: 0.25, blue: 0.25))
+                                        }
+                                    }
+                                }
+                            }
+                        } label: {
+                            HStack(spacing: 8) {
+                                Text(selectedCategory)
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.primary)
+                                
+                                                            Image(systemName: "chevron.down")
+                                .font(.caption2)
+                                .foregroundColor(Color(red: 0.85, green: 0.25, blue: 0.25))
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
+                        }
                     }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
                     .background(
-                        RoundedRectangle(cornerRadius: 12)
-                            .fill(Color(.systemGray6))
+                        RoundedRectangle(cornerRadius: 25)
+                            .fill(Color(.systemBackground))
+                            .shadow(color: Color.black.opacity(0.08), radius: 4, x: 0, y: 2)
+                    )
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 25)
+                            .stroke(Color(.systemGray5), lineWidth: 0.5)
                     )
                     
-                    Spacer()
                 }
+                .padding(.top, 8)
                 
-                // Mood and search filter bar
-                HStack(spacing: 16) {
-                    // Mood/feeling filter
+
+                .padding(.leading, 20)
+                
+                // Mood filter bar - Clean chip design
+                VStack(spacing: 12) {
                     ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 12) {
+                        HStack(spacing: 8) {
                             ForEach(TravelMood.allCases, id: \.self) { mood in
                                 Button(action: {
-                                    selectedMood = selectedMood == mood ? nil : mood
+                                    withAnimation(.easeInOut(duration: 0.2)) {
+                                        selectedMood = selectedMood == mood ? nil : mood
+                                    }
                                 }) {
                                     HStack(spacing: 6) {
                                         Image(systemName: mood.icon)
                                             .font(.caption)
+                                            .foregroundColor(selectedMood == mood ? .white : .black)
                                         Text(mood.displayName)
                                             .font(.caption)
                                             .fontWeight(.medium)
+                                            .foregroundColor(selectedMood == mood ? .white : .primary)
                                     }
-                                    .foregroundColor(selectedMood == mood ? .white : .primary)
-                                    .padding(.horizontal, 12)
-                                    .padding(.vertical, 6)
+                                    .padding(.horizontal, 14)
+                                    .padding(.vertical, 8)
                                     .background(
-                                        RoundedRectangle(cornerRadius: 16)
-                                            .fill(selectedMood == mood ? mood.color : Color(.systemGray6))
+                                        RoundedRectangle(cornerRadius: 20)
+                                            .fill(selectedMood == mood ? Color.black : Color.clear)
+                                    )
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 20)
+                                            .stroke(
+                                                selectedMood == mood ? Color.black : Color(.systemGray4), 
+                                                lineWidth: 1
+                                            )
                                     )
                                 }
                             }
                         }
                         .padding(.horizontal, 20)
                     }
-                    
-                    // Search box
-                    HStack {
-                        Image(systemName: "magnifyingglass")
-                            .foregroundColor(.gray)
-                            .font(.caption)
-                        
-                        TextField("Search experiences...", text: $searchText)
-                            .font(.caption)
-                            .textFieldStyle(PlainTextFieldStyle())
-                    }
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 8)
-                    .background(Color(.systemGray6))
-                    .cornerRadius(16)
-                    .frame(width: 150)
                 }
-                .padding(.horizontal, 20)
-                .padding(.bottom, 16)
-                .padding(.horizontal, 20)
                 .padding(.vertical, 16)
                 .background(Color(.systemGroupedBackground))
                 
@@ -387,11 +411,20 @@ struct ContentView: View {
             .background(Color(.systemGroupedBackground).ignoresSafeArea())
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
+                        showCardCreationForm = true
+                    }) {
+                        Image(systemName: "plus.circle.fill")
+                            .font(.title2)
+                            .foregroundColor(Color(red: 0.85, green: 0.25, blue: 0.25))
+                    }
+                }
                 ToolbarItem(placement: .principal) {
-                    Text("TravelGPT")
+                    Text("PostcardGPT")
                         .font(.title2)
                         .fontWeight(.bold)
-                        .foregroundColor(Color(red: 0.2, green: 0.5, blue: 0.9))
+                        .foregroundColor(Color(hex: "083242"))
                 }
                 ToolbarItem(placement: .navigationBarTrailing) {
                     Button(action: { showProfile = true }) {
@@ -424,6 +457,9 @@ struct ContentView: View {
                     }
                 )
             }
+            .sheet(isPresented: $showCardCreationForm) {
+                CardCreationFormView()
+            }
         }
         .navigationViewStyle(.stack)
     }
@@ -452,7 +488,7 @@ struct ContentView: View {
                         owner_destination_name: "Travel Destination",
                         rarity: "common",
                         collection_tags: [],
-                        category: "Activities"
+                        category: "Activities", isVerified: false
                     )
                     
                     cardStore.addCard(newCard)
@@ -498,10 +534,18 @@ struct SimpleTravelCardView: View {
             VStack(alignment: .leading, spacing: 16) {
                 // Location and thought
                 VStack(alignment: .leading, spacing: 8) {
-                    Text(card.destination_name)
-                        .font(.headline)
-                        .fontWeight(.bold)
-                        .foregroundColor(.primary)
+                    HStack(spacing: 8) {
+                        Text(card.destination_name)
+                            .font(.headline)
+                            .fontWeight(.bold)
+                            .foregroundColor(.primary)
+                        
+                        if card.isVerified {
+                            Image(systemName: "checkmark.seal.fill")
+                                .foregroundColor(.blue)
+                                .font(.caption)
+                        }
+                    }
                     
                     Text(card.thought)
                         .font(.body)
@@ -573,7 +617,7 @@ struct SimpleTravelCardView: View {
                         .foregroundColor(.white)
                         .padding(.horizontal, 12)
                         .padding(.vertical, 6)
-                        .background(Color.green)
+                        .background(Color.black)
                         .cornerRadius(12)
                     }
                     
@@ -1074,7 +1118,7 @@ struct AddCardView: View {
                 owner_destination_name: "New Experience",
                 rarity: "common",
                 collection_tags: ["Personal Experience"],
-                category: category == "All" ? "Activities" : category,
+                category: category == "All" ? "Activities" : category, isVerified: false,
                 checkInPhotos: []
             )
             
@@ -1133,6 +1177,205 @@ enum TravelMood: String, CaseIterable {
 #Preview {
     ContentView()
         .environmentObject(CardStore())
+}
+
+// MARK: - Card Creation Form View
+
+struct CardCreationFormView: View {
+    @Environment(\.dismiss) private var dismiss
+    @State private var destinationName = ""
+    @State private var thought = ""
+    @State private var selectedImage: UIImage?
+    @State private var showImagePicker = false
+    @State private var isSubmitting = false
+    
+    var body: some View {
+        NavigationView {
+            ZStack {
+                // Postcard background
+                Color(.systemBackground)
+                    .ignoresSafeArea()
+                
+                VStack(spacing: 0) {
+                    // Postcard header
+                    VStack(spacing: 8) {
+                        Image(systemName: "airplane.circle.fill")
+                            .font(.system(size: 40))
+                            .foregroundColor(.blue)
+                        
+                        Text("Write Your Postcard")
+                            .font(.title2)
+                            .fontWeight(.bold)
+                            .foregroundColor(.primary)
+                        
+                        Text("Share a moment from your journey")
+                            .font(.subheadline)
+                            .foregroundColor(.secondary)
+                    }
+                    .padding(.top, 30)
+                    .padding(.bottom, 20)
+                    
+                    // Postcard content area
+                    VStack(spacing: 0) {
+                        // Image section (top half of postcard)
+                        VStack(spacing: 0) {
+                            if let selectedImage = selectedImage {
+                                Image(uiImage: selectedImage)
+                                    .resizable()
+                                    .aspectRatio(contentMode: .fill)
+                                    .frame(height: 250)
+                                    .clipped()
+                                    .overlay(
+                                        Button(action: {
+                                            self.selectedImage = nil
+                                        }) {
+                                            Image(systemName: "xmark.circle.fill")
+                                                .font(.title2)
+                                                .foregroundColor(.white)
+                                                .background(Color.black.opacity(0.7))
+                                                .clipShape(Circle())
+                                        }
+                                        .padding(12),
+                                        alignment: .topTrailing
+                                    )
+                            } else {
+                                Button(action: {
+                                    showImagePicker = true
+                                }) {
+                                    VStack(spacing: 16) {
+                                        Image(systemName: "camera.fill")
+                                            .font(.system(size: 50))
+                                            .foregroundColor(.blue)
+                                        
+                                        Text("Add Your Photo")
+                                            .font(.headline)
+                                            .foregroundColor(.blue)
+                                        
+                                        Text("Capture the moment")
+                                            .font(.subheadline)
+                                            .foregroundColor(.secondary)
+                                    }
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 250)
+                                    .background(
+                                        LinearGradient(
+                                            colors: [Color(.systemGray6), Color(.systemGray5)],
+                                            startPoint: .top,
+                                            endPoint: .bottom
+                                        )
+                                    )
+                                    .overlay(
+                                        RoundedRectangle(cornerRadius: 0)
+                                            .stroke(Color(.systemGray4), lineWidth: 1)
+                                    )
+                                }
+                            }
+                        }
+                        
+                        // Writing section (bottom half of postcard)
+                        VStack(spacing: 20) {
+                            // Where you are
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("📍 Where are you?")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.primary)
+                                
+                                TextField("e.g., Sagrada Familia, Barcelona", text: $destinationName)
+                                    .textFieldStyle(PlainTextFieldStyle())
+                                    .font(.title3)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 12)
+                                    .background(Color(.systemGray6))
+                                    .cornerRadius(12)
+                            }
+                            
+                            // What's happening
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("💭 What's happening?")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.primary)
+                                
+                                TextField("Tell us about your experience...", text: $thought, axis: .vertical)
+                                    .textFieldStyle(PlainTextFieldStyle())
+                                    .font(.body)
+                                    .lineLimit(4...8)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 12)
+                                    .background(Color(.systemGray6))
+                                    .cornerRadius(12)
+                            }
+                        }
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 24)
+                        .background(Color(.systemBackground))
+                    }
+                    .background(
+                        RoundedRectangle(cornerRadius: 16)
+                            .fill(Color(.systemBackground))
+                            .shadow(color: Color.black.opacity(0.1), radius: 8, x: 0, y: 4)
+                    )
+                    .padding(.horizontal, 20)
+                    
+                    Spacer()
+                    
+                    // Send button
+                    Button(action: submitCard) {
+                        HStack(spacing: 12) {
+                            if isSubmitting {
+                                ProgressView()
+                                    .scaleEffect(0.8)
+                                    .foregroundColor(.white)
+                            } else {
+                                Image(systemName: "paperplane.fill")
+                                Text("Send Postcard")
+                            }
+                        }
+                        .foregroundColor(.white)
+                        .font(.headline)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 18)
+                        .background(
+                            RoundedRectangle(cornerRadius: 16)
+                                .fill(canSubmit ? Color.blue : Color.gray)
+                        )
+                    }
+                    .disabled(!canSubmit || isSubmitting)
+                    .padding(.horizontal, 20)
+                    .padding(.bottom, 30)
+                }
+            }
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button("Cancel") {
+                        dismiss()
+                    }
+                    .foregroundColor(.blue)
+                }
+            }
+            .sheet(isPresented: $showImagePicker) {
+                ImagePicker(image: $selectedImage, onImageSelected: { _ in })
+            }
+        }
+    }
+    
+    private var canSubmit: Bool {
+        !destinationName.isEmpty && 
+        !thought.isEmpty && 
+        selectedImage != nil
+    }
+    
+    private func submitCard() {
+        isSubmitting = true
+        
+        // Simulate submission
+        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            isSubmitting = false
+            dismiss()
+        }
+    }
 }
 
 
