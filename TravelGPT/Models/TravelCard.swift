@@ -22,6 +22,21 @@ struct TravelCard: Identifiable, Codable {
     let isVerified: Bool
     var checkInPhotos: [CheckInPhoto] = []
     
+    // New fields from API specification
+    let s3_url: String?
+    let location: String?
+    let coordinates: String?
+    let admin_review_status: String?
+    let admin_reviewer_id: Int?
+    let admin_reviewed_at: String?
+    let admin_notes: String?
+    let check_in_count: Int?
+    let comment_count: Int?
+    let is_liked_by_user: Bool?
+    let is_checked_in_by_user: Bool?
+    let moods: [String]?
+    let user: UserResponse?
+    
     var formattedDate: String {
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
@@ -35,6 +50,39 @@ struct TravelCard: Identifiable, Codable {
     var rarityEnum: Rarity? {
         guard let rarityString = rarity else { return nil }
         return Rarity(rawValue: rarityString)
+    }
+    
+    // Computed property for admin review status
+    var reviewStatus: AdminReviewStatus {
+        guard let status = admin_review_status else { return .unknown }
+        return AdminReviewStatus(rawValue: status) ?? .unknown
+    }
+}
+
+// MARK: - Admin Review Status
+
+enum AdminReviewStatus: String, CaseIterable {
+    case pending = "pending"
+    case approved = "approved"
+    case rejected = "rejected"
+    case unknown = "unknown"
+    
+    var displayName: String {
+        switch self {
+        case .pending: return "Pending Review"
+        case .approved: return "Approved"
+        case .rejected: return "Rejected"
+        case .unknown: return "Unknown"
+        }
+    }
+    
+    var color: Color {
+        switch self {
+        case .pending: return .orange
+        case .approved: return .green
+        case .rejected: return .red
+        case .unknown: return .gray
+        }
     }
 }
 
@@ -68,7 +116,7 @@ class CardStore: ObservableObject {
     
     let maxDailyNormal = 3
     let maxDailyIntrusive = 1
-    private let pageSize = 10
+    private let pageSize = 20
     
     private let cardsKey = "savedCards"
     private let dailyNormalKey = "dailyNormalCount"
@@ -128,16 +176,16 @@ class CardStore: ObservableObject {
                 switch self.feedType {
                 case .all:
                     print("📡 Fetching public feed with isIntrusive: \(isIntrusiveMode)")
-                    let cards = try await BackendService.shared.fetchFeed(page: 1, pageSize: self.pageSize, isIntrusive: self.isIntrusiveMode)
-                    print("📦 Received \(cards.count) cards from API (pageSize: \(self.pageSize))")
+                    let response = try await TravelCardAPIService.shared.getCards(page: 1, pageSize: self.pageSize)
+                    print("📦 Received \(response.results.count) cards from API (pageSize: \(self.pageSize))")
                     await MainActor.run {
-                        self.cards = cards
-                        self.hasMoreContent = cards.count >= self.pageSize
-                        print("📊 Initial load - cards: \(cards.count), hasMoreContent: \(self.hasMoreContent)")
+                        self.cards = response.results
+                        self.hasMoreContent = response.next ?? false
+                        print("📊 Initial load - cards: \(response.results.count), hasMoreContent: \(self.hasMoreContent)")
                     }
                 case .myCards:
                     print("📡 Fetching my cards with isIntrusive: \(isIntrusiveMode)")
-                    let cards = try await BackendService.shared.fetchCards(isIntrusive: self.isIntrusiveMode)
+                    let cards = try await TravelCardAPIService.shared.getMyCards()
                     print("📦 Received \(cards.count) cards from API")
                     await MainActor.run {
                         self.cards = cards
@@ -217,17 +265,17 @@ class CardStore: ObservableObject {
         do {
             let nextPage = currentPage + 1
             print("📡 Fetching page \(nextPage) with pageSize \(pageSize)")
-            let newCards = try await BackendService.shared.fetchFeed(page: nextPage, pageSize: pageSize, isIntrusive: self.isIntrusiveMode)
-            print("📦 Received \(newCards.count) new cards from page \(nextPage)")
+            let response = try await TravelCardAPIService.shared.getCards(page: nextPage, pageSize: pageSize)
+            print("📦 Received \(response.results.count) new cards from page \(nextPage)")
             
-            if newCards.count < pageSize {
+            if response.results.count < pageSize {
                 print("📉 Received fewer cards than pageSize, setting hasMoreContent to false")
                 hasMoreContent = false
             }
             
-            if !newCards.isEmpty {
-                print("✅ Adding \(newCards.count) new cards to existing \(self.cards.count) cards")
-                self.cards.append(contentsOf: newCards)
+            if !response.results.isEmpty {
+                print("✅ Adding \(response.results.count) new cards to existing \(self.cards.count) cards")
+                self.cards.append(contentsOf: response.results)
                 currentPage = nextPage
                 print("📊 Total cards now: \(self.cards.count), currentPage: \(currentPage)")
             } else {
@@ -329,7 +377,7 @@ class CardStore: ObservableObject {
     func deleteCard(_ card: TravelCard) {
         Task {
             do {
-                try await BackendService.shared.deleteCard(card.id)
+                try await TravelCardAPIService.shared.deleteCard(id: card.id)
                 cards.removeAll { $0.id == card.id }
             } catch {
                 print("Error deleting card: \(error)")
@@ -340,11 +388,9 @@ class CardStore: ObservableObject {
     func toggleLike(_ card: TravelCard) {
         Task {
             do {
-                let (liked, likeCount) = card.is_liked ?
-                    try await BackendService.shared.unlikeCard(card.id) :
-                    try await BackendService.shared.likeCard(card.id)
+                let (liked, likeCount) = try await TravelCardAPIService.shared.toggleLike(cardId: card.id)
                 
-        if let index = cards.firstIndex(where: { $0.id == card.id }) {
+                if let index = cards.firstIndex(where: { $0.id == card.id }) {
                     var updatedCard = card
                     updatedCard.is_liked = liked
                     updatedCard.like_count = likeCount
@@ -389,4 +435,113 @@ class CardStore: ObservableObject {
         }
     }
     // ---
+} 
+
+// MARK: - API Models
+
+struct CreateCardResponse: Codable {
+    let id: Int
+    let destination_name: String
+    let image: String
+    let s3_url: String
+    let thought: String
+    let location: String
+    let coordinates: String?
+    let category: String
+    let is_verified: Bool
+    let admin_review_status: String
+    let user: UserResponse
+    let created_at: String
+    let updated_at: String
+    let like_count: Int
+    let check_in_count: Int
+    let comment_count: Int
+    let is_liked_by_user: Bool
+    let is_checked_in_by_user: Bool
+    let moods: [String]
+}
+
+struct UserResponse: Codable {
+    let id: Int
+    let username: String
+    let first_name: String?
+    let last_name: String?
+    let email: String?
+}
+
+struct CheckInResponse: Codable {
+    let id: Int
+    let photo: String?
+    let s3_url: String?
+    let caption: String?
+    let coordinates: String?
+    let user: UserResponse
+    let created_at: String
+}
+
+struct CommentResponse: Codable {
+    let id: Int
+    let content: String
+    let user: UserResponse
+    let parent: Int?
+    let created_at: String
+    let updated_at: String
+    let like_count: Int
+    let reply_count: Int
+    let is_liked_by_user: Bool
+}
+
+struct CollectionResponse: Codable {
+    let id: Int
+    let name: String
+    let description: String?
+    let is_public: Bool
+    let cover_image: String?
+    let user: UserResponse
+    let created_at: String
+    let updated_at: String
+    let card_count: Int
+}
+
+struct CollectionDetailResponse: Codable {
+    let id: Int
+    let name: String
+    let description: String?
+    let is_public: Bool
+    let cover_image: String?
+    let user: UserResponse
+    let created_at: String
+    let updated_at: String
+    let card_count: Int
+    let cards: [TravelCard]
+}
+
+struct TravelMoodResponse: Codable {
+    let id: Int
+    let name: String
+    let icon: String
+    let color: String
+    let description: String
+}
+
+struct PaginatedResponse<T: Codable>: Codable {
+    let results: [T]
+    let count: Int
+    let next: Bool?
+    let previous: Bool?
+    let total_pages: Int
+}
+
+struct AdminReviewRequest: Codable {
+    let action: String // "approve" or "reject"
+    let notes: String?
+}
+
+struct AdminStatsResponse: Codable {
+    let total_cards: Int
+    let pending_cards: Int
+    let approved_cards: Int
+    let rejected_cards: Int
+    let cards_today: Int
+    let average_review_time_hours: Double
 } 

@@ -82,10 +82,23 @@ struct ContentView: View {
             category: "Activities",
             isVerified: true,
             checkInPhotos: [
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400", userName: "Carlos", caption: "Incredible hike to the top!"),
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Maria", caption: "The monastery is magical"),
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=400", userName: "Javier", caption: "Best views in Catalonia!")
-            ]
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400", userName: "Carlos", caption: "Incredible hike to the top!"),
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Maria", caption: "The monastery is magical"),
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=400", userName: "Javier", caption: "Best views in Catalonia!")
+            ],
+            s3_url: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop",
+            location: "Barcelona, Spain",
+            coordinates: "41.5917,1.8353",
+            admin_review_status: "approved",
+            admin_reviewer_id: 1,
+            admin_reviewed_at: "2025-01-15T11:00:00Z",
+            admin_notes: "Great photo and description",
+            check_in_count: 15,
+            comment_count: 8,
+            is_liked_by_user: false,
+            is_checked_in_by_user: false,
+            moods: ["adventure", "nature"],
+            user: UserResponse(id: 1, username: "traveler123", first_name: "John", last_name: "Doe", email: "john@example.com")
         ),
         TravelCard(
             id: 2,
@@ -106,9 +119,22 @@ struct ContentView: View {
             category: "Activities",
             isVerified: true,
             checkInPhotos: [
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Ana", caption: "Olympic history right here!"),
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400", userName: "Pablo", caption: "The stadium is massive")
-            ]
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Ana", caption: "Olympic history right here!"),
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400", userName: "Pablo", caption: "The stadium is massive")
+            ],
+            s3_url: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
+            location: "Barcelona, Spain",
+            coordinates: "41.3633,2.1522",
+            admin_review_status: "approved",
+            admin_reviewer_id: 1,
+            admin_reviewed_at: "2025-01-14T16:00:00Z",
+            admin_notes: "Excellent historical content",
+            check_in_count: 23,
+            comment_count: 12,
+            is_liked_by_user: true,
+            is_checked_in_by_user: false,
+            moods: ["history", "sports"],
+            user: UserResponse(id: 2, username: "olympicfan", first_name: "Sarah", last_name: "Smith", email: "sarah@example.com")
         ),
         TravelCard(
             id: 3,
@@ -129,9 +155,22 @@ struct ContentView: View {
             category: "Activities",
             isVerified: true,
             checkInPhotos: [
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=400", userName: "Sofia", caption: "Most fun I've ever had!"),
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Diego", caption: "Tomato stains everywhere!")
-            ]
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=400", userName: "Sofia", caption: "Most fun I've ever had!"),
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Diego", caption: "Tomato stains everywhere!")
+            ],
+            s3_url: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&h=600&fit=crop",
+            location: "Buñol, Spain",
+            coordinates: "39.4183,-0.7903",
+            admin_review_status: "approved",
+            admin_reviewer_id: 1,
+            admin_reviewed_at: "2025-01-13T20:00:00Z",
+            admin_notes: "Fun festival content",
+            check_in_count: 45,
+            comment_count: 18,
+            is_liked_by_user: false,
+            is_checked_in_by_user: false,
+            moods: ["festival", "fun"],
+            user: UserResponse(id: 3, username: "festivallover", first_name: "Maria", last_name: "Garcia", email: "maria@example.com")
         ),
         TravelCard(
             id: 4,
@@ -152,9 +191,22 @@ struct ContentView: View {
             category: "Museums",
             isVerified: true,
             checkInPhotos: [
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400", userName: "Elena", caption: "The light inside is magical"),
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Miguel", caption: "Gaudí was a genius!")
-            ]
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400", userName: "Elena", caption: "The light inside is magical"),
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Miguel", caption: "Gaudí was a genius!")
+            ],
+            s3_url: "https://images.unsplash.com/photo-1589308078059-be1415eab4c3?w=800&h=600&fit=crop",
+            location: "Barcelona, Spain",
+            coordinates: "41.4036,2.1744",
+            admin_review_status: "approved",
+            admin_reviewer_id: 1,
+            admin_reviewed_at: "2025-01-12T19:00:00Z",
+            admin_notes: "Beautiful architectural content",
+            check_in_count: 67,
+            comment_count: 25,
+            is_liked_by_user: true,
+            is_checked_in_by_user: false,
+            moods: ["architecture", "culture"],
+            user: UserResponse(id: 4, username: "architectfan", first_name: "Carlos", last_name: "Lopez", email: "carlos@example.com")
         ),
         TravelCard(
             id: 5,
@@ -175,9 +227,22 @@ struct ContentView: View {
             category: "Restaurants",
             isVerified: true,
             checkInPhotos: [
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Carmen", caption: "Best tapas in the city!"),
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400", userName: "Luis", caption: "Fresh seafood everywhere")
-            ]
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Carmen", caption: "Best tapas in the city!"),
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400", userName: "Luis", caption: "Fresh seafood everywhere")
+            ],
+            s3_url: "https://lp-cms-production.imgix.net/2025-02/shutterstock1238252371.jpg?auto=format,compress&q=72&w=1440&h=810&fit=crop",
+            location: "Barcelona, Spain",
+            coordinates: "41.3819,2.1716",
+            admin_review_status: "approved",
+            admin_reviewer_id: 1,
+            admin_reviewed_at: "2025-01-11T15:00:00Z",
+            admin_notes: "Great food market content",
+            check_in_count: 34,
+            comment_count: 15,
+            is_liked_by_user: false,
+            is_checked_in_by_user: false,
+            moods: ["food", "culture"],
+            user: UserResponse(id: 5, username: "foodie", first_name: "Isabella", last_name: "Martinez", email: "isabella@example.com")
         ),
         TravelCard(
             id: 6,
@@ -198,9 +263,22 @@ struct ContentView: View {
             category: "Activities",
             isVerified: true,
             checkInPhotos: [
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400", userName: "Isabella", caption: "The mosaics are incredible"),
-                CheckInPhoto(imageUrl: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400", userName: "Roberto", caption: "Perfect for photos!")
-            ]
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Antonio", caption: "The mosaics are incredible!"),
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=400", userName: "Lucia", caption: "Perfect for a sunny day")
+            ],
+            s3_url: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop",
+            location: "Barcelona, Spain",
+            coordinates: "41.4145,2.1527",
+            admin_review_status: "approved",
+            admin_reviewer_id: 1,
+            admin_reviewed_at: "2025-01-10T13:00:00Z",
+            admin_notes: "Beautiful park content",
+            check_in_count: 56,
+            comment_count: 22,
+            is_liked_by_user: true,
+            is_checked_in_by_user: false,
+            moods: ["nature", "architecture"],
+            user: UserResponse(id: 6, username: "parklover", first_name: "David", last_name: "Rodriguez", email: "david@example.com")
         )
     ]
     
@@ -488,7 +566,21 @@ struct ContentView: View {
                         owner_destination_name: "Travel Destination",
                         rarity: "common",
                         collection_tags: [],
-                        category: "Activities", isVerified: false
+                        category: "Activities",
+                        isVerified: false,
+                        s3_url: imageUrl,
+                        location: "Unknown Location",
+                        coordinates: nil,
+                        admin_review_status: "pending",
+                        admin_reviewer_id: nil,
+                        admin_reviewed_at: nil,
+                        admin_notes: nil,
+                        check_in_count: 0,
+                        comment_count: 0,
+                        is_liked_by_user: false,
+                        is_checked_in_by_user: false,
+                        moods: [],
+                        user: nil
                     )
                     
                     cardStore.addCard(newCard)
@@ -828,108 +920,12 @@ struct CheckInPhoto: Identifiable, Codable {
     let timestamp: Date
     let caption: String?
     
-    init(imageUrl: String, userName: String, caption: String? = nil) {
-        self.id = UUID()
+    init(id: UUID = UUID(), imageUrl: String, userName: String, caption: String? = nil) {
+        self.id = id
         self.imageUrl = imageUrl
         self.userName = userName
         self.timestamp = Date()
         self.caption = caption
-    }
-}
-
-// MARK: - Check-in View
-
-struct CheckInView: View {
-    let card: TravelCard
-    @Environment(\.dismiss) private var dismiss
-    @State private var selectedImage: UIImage?
-    @State private var caption = ""
-    @State private var isUploading = false
-    @State private var showImagePicker = false
-    
-    var body: some View {
-        NavigationView {
-            VStack(spacing: 20) {
-                Text("Check In at \(card.destination_name)")
-                    .font(.title2)
-                    .fontWeight(.bold)
-                
-                if let selectedImage = selectedImage {
-                    Image(uiImage: selectedImage)
-                        .resizable()
-                        .aspectRatio(contentMode: .fit)
-                        .frame(height: 200)
-                        .cornerRadius(12)
-                } else {
-                    Button(action: {
-                        showImagePicker = true
-                    }) {
-                        VStack(spacing: 12) {
-                            Image(systemName: "camera.fill")
-                                .font(.system(size: 48))
-                                .foregroundColor(.blue)
-                            
-                            Text("Take Photo")
-                                .font(.headline)
-                                .foregroundColor(.blue)
-                        }
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 200)
-                        .background(Color.blue.opacity(0.1))
-                        .cornerRadius(12)
-                    }
-                }
-                
-                TextField("Add a caption (optional)", text: $caption, axis: .vertical)
-                    .textFieldStyle(RoundedBorderTextFieldStyle())
-                    .lineLimit(3...6)
-                
-                Button(action: uploadCheckIn) {
-                    HStack {
-                        if isUploading {
-                            ProgressView()
-                                .scaleEffect(0.8)
-                        } else {
-                            Text("Check In!")
-                        }
-                    }
-                    .foregroundColor(.white)
-                    .padding(.horizontal, 32)
-                    .padding(.vertical, 12)
-                    .background(selectedImage != nil ? Color.green : Color.gray)
-                    .cornerRadius(20)
-                }
-                .disabled(selectedImage == nil || isUploading)
-                
-                Spacer()
-            }
-            .padding()
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarLeading) {
-                    Button("Cancel") {
-                        dismiss()
-                    }
-                }
-            }
-            .sheet(isPresented: $showImagePicker) {
-                ImagePicker(image: $selectedImage, onImageSelected: { _ in })
-            }
-        }
-    }
-    
-    private func uploadCheckIn() {
-        guard let selectedImage = selectedImage else { return }
-        
-        isUploading = true
-        
-        // Simulate upload
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            // In a real app, you'd upload to your backend
-            // For now, we'll just dismiss
-            isUploading = false
-            dismiss()
-        }
     }
 }
 
@@ -1118,8 +1114,21 @@ struct AddCardView: View {
                 owner_destination_name: "New Experience",
                 rarity: "common",
                 collection_tags: ["Personal Experience"],
-                category: category == "All" ? "Activities" : category, isVerified: false,
-                checkInPhotos: []
+                category: category == "All" ? "Activities" : category,
+                isVerified: false,
+                s3_url: "https://example.com/placeholder.jpg",
+                location: location,
+                coordinates: nil,
+                admin_review_status: "pending",
+                admin_reviewer_id: nil,
+                admin_reviewed_at: nil,
+                admin_notes: nil,
+                check_in_count: 0,
+                comment_count: 0,
+                is_liked_by_user: false,
+                is_checked_in_by_user: false,
+                moods: [],
+                user: nil
             )
             
             onCardCreated(newCard)
@@ -1188,6 +1197,10 @@ struct CardCreationFormView: View {
     @State private var selectedImage: UIImage?
     @State private var showImagePicker = false
     @State private var isSubmitting = false
+    @State private var selectedCategory = "Activities"
+    @State private var location = "Barcelona, Spain"
+    
+    private let categories = ["Activities", "Museums", "Restaurants", "Beach", "Mountain", "City", "Culture", "Nature"]
     
     var body: some View {
         NavigationView {
@@ -1290,6 +1303,26 @@ struct CardCreationFormView: View {
                                     .cornerRadius(12)
                             }
                             
+                            // Category selection
+                            VStack(alignment: .leading, spacing: 8) {
+                                Text("🏷️ Category")
+                                    .font(.headline)
+                                    .fontWeight(.semibold)
+                                    .foregroundColor(.primary)
+                                
+                                Picker("Category", selection: $selectedCategory) {
+                                    ForEach(categories, id: \.self) { category in
+                                        Text(category).tag(category)
+                                    }
+                                }
+                                .pickerStyle(MenuPickerStyle())
+                                .frame(maxWidth: .infinity)
+                                .padding(.horizontal, 16)
+                                .padding(.vertical, 12)
+                                .background(Color(.systemGray6))
+                                .cornerRadius(12)
+                            }
+                            
                             // What's happening
                             VStack(alignment: .leading, spacing: 8) {
                                 Text("💭 What's happening?")
@@ -1320,7 +1353,6 @@ struct CardCreationFormView: View {
                     
                     Spacer()
                     
-                    // Send button
                     Button(action: submitCard) {
                         HStack(spacing: 12) {
                             if isSubmitting {
@@ -1368,12 +1400,36 @@ struct CardCreationFormView: View {
     }
     
     private func submitCard() {
+        guard let image = selectedImage else { return }
+        
         isSubmitting = true
         
-        // Simulate submission
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            isSubmitting = false
-            dismiss()
+        Task {
+            do {
+                let response = try await TravelCardAPIService.shared.createCard(
+                    image: image,
+                    destinationName: destinationName,
+                    thought: thought,
+                    location: location,
+                    coordinates: nil,
+                    category: selectedCategory.lowercased()
+                )
+                
+                await MainActor.run {
+                    isSubmitting = false
+                    dismiss()
+                }
+                
+                // Show success message or handle the created card
+                print("Card created successfully: \(response.id)")
+                
+            } catch {
+                await MainActor.run {
+                    isSubmitting = false
+                    // Handle error - show alert or error message
+                    print("Error creating card: \(error)")
+                }
+            }
         }
     }
 }

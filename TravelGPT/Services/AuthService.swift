@@ -333,6 +333,10 @@ class AuthService: ObservableObject {
         return getKeychainValue(forKey: accessTokenKey)
     }
     
+    var accessToken: String? {
+        getAccessToken()
+    }
+    
     nonisolated func getRefreshToken() -> String? {
         return getKeychainValue(forKey: refreshTokenKey)
     }

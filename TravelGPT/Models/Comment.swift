@@ -158,11 +158,6 @@ struct CreateCommentRequest: Codable {
     }
 }
 
-struct CommentResponse: Codable {
-    let comment: Comment
-    let message: String
-}
-
 // Backend returns the comment directly, not wrapped
 struct CommentCreateResponse: Codable {
     let id: String

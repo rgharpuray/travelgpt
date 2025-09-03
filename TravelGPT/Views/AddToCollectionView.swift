@@ -272,7 +272,21 @@ struct CreateCollectionView: View {
         owner_destination_name: "Paris",
         rarity: "rare",
         collection_tags: ["European Adventures"],
-        category: "Activities", isVerified: false
+        category: "Activities",
+        isVerified: false,
+        s3_url: "https://example.com/image.jpg",
+        location: "Paris, France",
+        coordinates: "48.8566,2.3522",
+        admin_review_status: "approved",
+        admin_reviewer_id: 1,
+        admin_reviewed_at: "2025-01-01T00:00:00Z",
+        admin_notes: "Great photo",
+        check_in_count: 0,
+        comment_count: 0,
+        is_liked_by_user: false,
+        is_checked_in_by_user: false,
+        moods: ["romantic", "cultural"],
+        user: UserResponse(id: 1, username: "traveler", first_name: "John", last_name: "Doe", email: "john@example.com")
     ))
 }
 

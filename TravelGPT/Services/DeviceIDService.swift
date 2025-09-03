@@ -3,7 +3,12 @@ import Security
 
 class DeviceIDService {
     static let shared = DeviceIDService()
-    private let deviceIDKey = "com.barkgpt.deviceID"
+    
+    private let deviceIDKey = "com.travelgpt.deviceID"
+    
+    var deviceID: String {
+        getOrCreateDeviceID()
+    }
     
     private init() {}
     

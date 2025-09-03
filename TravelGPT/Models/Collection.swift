@@ -58,10 +58,6 @@ struct UpdateCollectionRequest: Codable {
     let description: String
 }
 
-struct CollectionResponse: Codable {
-    let collection: Collection
-}
-
 // MARK: - Mock Collection Store
 @MainActor
 class CollectionStore: ObservableObject {
