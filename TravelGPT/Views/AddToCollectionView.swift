@@ -107,13 +107,13 @@ struct CardPreviewView: View {
                 .shadow(radius: 4)
             
             VStack(spacing: 8) {
-                AsyncImageView(url: URL(string: card.image_url))
+                AsyncImageView(url: URL(string: card.image))
                     .aspectRatio(contentMode: .fill)
                     .frame(height: 120)
                     .clipped()
                     .cornerRadius(12)
                 
-                Text(card.thought)
+                Text(card.thought ?? "No description")
                     .font(.caption)
                     .lineLimit(2)
                     .multilineTextAlignment(.center)
@@ -259,7 +259,7 @@ struct CreateCollectionView: View {
     AddToCollectionView(card: TravelCard(
         id: 1,
         destination_name: "Paris",
-        image_url: "https://example.com/image.jpg",
+                    image: "https://example.com/image.jpg",
         is_valid_destination: true,
         thought: "I wonder if the Eiffel Tower gets lonely at night...",
         created_at: "2025-01-01T00:00:00Z",

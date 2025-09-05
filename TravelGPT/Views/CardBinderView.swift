@@ -232,7 +232,7 @@ struct CardThumbnail: View {
             
             VStack {
                 ZStack(alignment: .topTrailing) {
-                    AsyncImageView(url: URL(string: card.image_url))
+                    AsyncImageView(url: URL(string: card.image))
                         .frame(height: 100)
                         .clipped()
                         .cornerRadius(8)
@@ -245,7 +245,7 @@ struct CardThumbnail: View {
                 }
                 
                 VStack(spacing: 2) {
-                    Text(card.thought)
+                    Text(card.thought ?? "No description")
                         .font(.caption)
                         .lineLimit(2)
                         .multilineTextAlignment(.center)

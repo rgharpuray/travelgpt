@@ -55,7 +55,7 @@ struct ContentView: View {
     @State private var showMapView = false
     @State private var showLocationPicker = false
     @State private var currentLocation = "Barcelona, Spain"
-    @State private var selectedCategory = "All"
+    @State private var selectedCategory = "all"
     @State private var selectedMood: TravelMood? = nil
     @State private var searchText = ""
     @State private var showAddCardSheet = false
@@ -66,7 +66,7 @@ struct ContentView: View {
         TravelCard(
             id: 1,
             destination_name: "Montserrat, Barcelona",
-            image_url: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop",
+            image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop",
             is_valid_destination: true,
             thought: "Great hike up to the monastery. The views of Catalonia from the top are impressive - you can see all the way to the Mediterranean.",
             created_at: "2025-01-15T10:30:00Z",
@@ -103,7 +103,7 @@ struct ContentView: View {
         TravelCard(
             id: 2,
             destination_name: "Montjuïc Olympic Stadium '92",
-            image_url: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
+            image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
             is_valid_destination: true,
             thought: "Standing in the Olympic Stadium where the '92 Games happened is impressive. You can feel the Olympic spirit that transformed Barcelona.",
             created_at: "2025-01-14T15:45:00Z",
@@ -139,7 +139,7 @@ struct ContentView: View {
         TravelCard(
             id: 3,
             destination_name: "La Tomatina Festival, Buñol",
-            image_url: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&h=600&fit=crop",
+            image: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&h=600&fit=crop",
             is_valid_destination: true,
             thought: "The world's biggest food fight is as chaotic and fun as it sounds. Getting pelted with tomatoes while thousands of people laugh and dance - it's pure Spanish fun.",
             created_at: "2025-01-13T19:20:00Z",
@@ -175,7 +175,7 @@ struct ContentView: View {
         TravelCard(
             id: 4,
             destination_name: "Sagrada Familia, Barcelona",
-            image_url: "https://images.unsplash.com/photo-1589308078059-be1415eab4c3?w=800&h=600&fit=crop",
+            image: "https://images.unsplash.com/photo-1589308078059-be1415eab4c3?w=800&h=600&fit=crop",
             is_valid_destination: true,
             thought: "Gaudí's masterpiece is impressive. The stained glass creates a beautiful cathedral effect that makes you feel like you're inside a living work of art.",
             created_at: "2025-01-12T18:00:00Z",
@@ -211,7 +211,7 @@ struct ContentView: View {
         TravelCard(
             id: 5,
             destination_name: "La Boqueria Market, Barcelona",
-            image_url: "https://lp-cms-production.imgix.net/2025-02/shutterstock1238252371.jpg?auto=format,compress&q=72&w=1440&h=810&fit=crop",
+            image: "https://lp-cms-production.imgix.net/2025-02/shutterstock1238252371.jpg?auto=format,compress&q=72&w=1440&h=810&fit=crop",
             is_valid_destination: true,
             thought: "This market is great for food lovers. Fresh seafood, colorful fruits, and the best jamón ibérico. The energy and smells make you want to try everything.",
             created_at: "2025-01-11T14:30:00Z",
@@ -247,7 +247,7 @@ struct ContentView: View {
         TravelCard(
             id: 6,
             destination_name: "Park Güell, Barcelona",
-            image_url: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop",
+            image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop",
             is_valid_destination: true,
             thought: "Walking through Park Güell feels like stepping into a fairy tale. The mosaic benches, dragon fountain, and whimsical architecture are impressive.",
             created_at: "2025-01-10T12:00:00Z",
@@ -284,10 +284,10 @@ struct ContentView: View {
     
     // Filtered cards based on category, mood, and search
     private var filteredCards: [TravelCard] {
-        var filtered = sampleCards
+        var filtered = cardStore.cards
         
         // Filter by category
-        if selectedCategory != "All" {
+        if selectedCategory != "all" {
             filtered = filtered.filter { $0.category == selectedCategory }
         }
         
@@ -296,7 +296,7 @@ struct ContentView: View {
             filtered = filtered.filter { card in
                 // For now, we'll filter based on the card's thought content
                 // In a real app, cards would have mood tags
-                let thought = card.thought.lowercased()
+                let thought = (card.thought ?? "").lowercased()
                 switch selectedMood {
                 case .excited:
                     return thought.contains("amazing") || thought.contains("incredible") || thought.contains("thrilling")
@@ -321,8 +321,8 @@ struct ContentView: View {
         // Filter by search text
         if !searchText.isEmpty {
             filtered = filtered.filter { card in
-                card.destination_name.lowercased().contains(searchText.lowercased()) ||
-                card.thought.lowercased().contains(searchText.lowercased())
+                (card.destination_name ?? "").lowercased().contains(searchText.lowercased()) ||
+                (card.thought ?? "").lowercased().contains(searchText.lowercased())
             }
         }
         
@@ -371,12 +371,12 @@ struct ContentView: View {
                         
                         // Category selector
                         Menu {
-                            ForEach(["All", "Restaurants", "Activities", "Museums"], id: \.self) { category in
+                            ForEach(["all", "restaurant", "museum", "adventure", "culture", "nature", "city", "beach", "mountain", "park", "shopping", "countryside", "other"], id: \.self) { category in
                                 Button(action: {
                                     selectedCategory = category
                                 }) {
                                     HStack {
-                                        Text(category)
+                                        Text(category.capitalized)
                                         if selectedCategory == category {
                                             Image(systemName: "checkmark")
                                                 .foregroundColor(Color(red: 0.85, green: 0.25, blue: 0.25))
@@ -386,7 +386,7 @@ struct ContentView: View {
                             }
                         } label: {
                             HStack(spacing: 8) {
-                                Text(selectedCategory)
+                                Text(selectedCategory.capitalized)
                                     .font(.subheadline)
                                     .fontWeight(.medium)
                                     .foregroundColor(.primary)
@@ -537,9 +537,15 @@ struct ContentView: View {
             }
             .sheet(isPresented: $showCardCreationForm) {
                 CardCreationFormView()
+                    .environmentObject(cardStore)
             }
         }
         .navigationViewStyle(.stack)
+        .onAppear {
+            Task {
+                await cardStore.refreshFeed()
+            }
+        }
     }
     
     private func generateThought(for image: UIImage) {
@@ -553,7 +559,7 @@ struct ContentView: View {
                     let newCard = TravelCard(
                         id: Int.random(in: 1000...9999),
                         destination_name: "Travel Destination",
-                        image_url: imageUrl,
+                        image: imageUrl,
                         is_valid_destination: true,
                         thought: thought,
                         created_at: ISO8601DateFormatter().string(from: Date()),
@@ -617,7 +623,7 @@ struct SimpleTravelCardView: View {
     var body: some View {
         VStack(spacing: 0) {
             // Main image section
-            AsyncImageView(url: URL(string: card.image_url))
+                            AsyncImageView(url: URL(string: card.image))
                 .aspectRatio(contentMode: .fill)
                 .frame(height: 250)
                 .clipped()
@@ -627,7 +633,7 @@ struct SimpleTravelCardView: View {
                 // Location and thought
                 VStack(alignment: .leading, spacing: 8) {
                     HStack(spacing: 8) {
-                        Text(card.destination_name)
+                        Text(card.destination_name ?? "Unknown Location")
                             .font(.headline)
                             .fontWeight(.bold)
                             .foregroundColor(.primary)
@@ -639,7 +645,7 @@ struct SimpleTravelCardView: View {
                         }
                     }
                     
-                    Text(card.thought)
+                    Text(card.thought ?? "No description available")
                         .font(.body)
                         .italic()
                         .foregroundColor(.secondary)
@@ -938,7 +944,7 @@ struct PhotoGalleryView: View {
     var body: some View {
         NavigationView {
             VStack(spacing: 0) {
-                Text("Check-ins at \(card.destination_name)")
+                Text("Check-ins at \(card.destination_name ?? "Unknown Location")")
                     .font(.title2)
                     .fontWeight(.bold)
                     .padding()
@@ -1101,7 +1107,7 @@ struct AddCardView: View {
             let newCard = TravelCard(
                 id: Int.random(in: 1000...9999),
                 destination_name: "New Experience in \(location)",
-                image_url: "https://example.com/placeholder.jpg", // In real app, upload image
+                image: "https://example.com/placeholder.jpg", // In real app, upload image
                 is_valid_destination: true,
                 thought: personalThought.isEmpty ? "Amazing experience in \(location)!" : personalThought,
                 created_at: ISO8601DateFormatter().string(from: Date()),
@@ -1192,15 +1198,25 @@ enum TravelMood: String, CaseIterable {
 
 struct CardCreationFormView: View {
     @Environment(\.dismiss) private var dismiss
+    @EnvironmentObject var cardStore: CardStore
     @State private var destinationName = ""
     @State private var thought = ""
     @State private var selectedImage: UIImage?
     @State private var showImagePicker = false
     @State private var isSubmitting = false
-    @State private var selectedCategory = "Activities"
+    @State private var selectedCategory = "adventure"
     @State private var location = "Barcelona, Spain"
+    @State private var showErrorAlert = false
+    @State private var errorMessage = ""
+    @State private var showSuccessAlert = false
     
-    private let categories = ["Activities", "Museums", "Restaurants", "Beach", "Mountain", "City", "Culture", "Nature"]
+    private let categories = ["adventure", "culture", "nature", "city", "beach", "mountain", "museum", "restaurant", "hotel", "park", "shopping", "countryside", "other"]
+    
+    private var displayCategories: [(value: String, display: String)] {
+        return categories.map { category in
+            (value: category, display: category.capitalized)
+        }
+    }
     
     var body: some View {
         NavigationView {
@@ -1289,7 +1305,7 @@ struct CardCreationFormView: View {
                         VStack(spacing: 20) {
                             // Where you are
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("📍 Where are you?")
+                                Text("📍 Where are you? (Optional)")
                                     .font(.headline)
                                     .fontWeight(.semibold)
                                     .foregroundColor(.primary)
@@ -1305,14 +1321,14 @@ struct CardCreationFormView: View {
                             
                             // Category selection
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("🏷️ Category")
+                                Text("🏷️ Category (Optional)")
                                     .font(.headline)
                                     .fontWeight(.semibold)
                                     .foregroundColor(.primary)
                                 
                                 Picker("Category", selection: $selectedCategory) {
-                                    ForEach(categories, id: \.self) { category in
-                                        Text(category).tag(category)
+                                    ForEach(displayCategories, id: \.value) { category in
+                                        Text(category.display).tag(category.value)
                                     }
                                 }
                                 .pickerStyle(MenuPickerStyle())
@@ -1325,7 +1341,7 @@ struct CardCreationFormView: View {
                             
                             // What's happening
                             VStack(alignment: .leading, spacing: 8) {
-                                Text("💭 What's happening?")
+                                Text("💭 What's happening? (Optional)")
                                     .font(.headline)
                                     .fontWeight(.semibold)
                                     .foregroundColor(.primary)
@@ -1390,12 +1406,20 @@ struct CardCreationFormView: View {
             .sheet(isPresented: $showImagePicker) {
                 ImagePicker(image: $selectedImage, onImageSelected: { _ in })
             }
+            .alert("Error Creating Card", isPresented: $showErrorAlert) {
+                Button("OK") { }
+            } message: {
+                Text(errorMessage)
+            }
+            .alert("Card Created!", isPresented: $showSuccessAlert) {
+                Button("OK") { }
+            } message: {
+                Text("Your postcard has been sent and is pending admin review.")
+            }
         }
     }
     
     private var canSubmit: Bool {
-        !destinationName.isEmpty && 
-        !thought.isEmpty && 
         selectedImage != nil
     }
     
@@ -1408,11 +1432,11 @@ struct CardCreationFormView: View {
             do {
                 let response = try await TravelCardAPIService.shared.createCard(
                     image: image,
-                    destinationName: destinationName,
-                    thought: thought,
-                    location: location,
+                    destinationName: destinationName.isEmpty ? nil : destinationName,
+                    thought: thought.isEmpty ? nil : thought,
+                    location: location.isEmpty ? nil : location,
                     coordinates: nil,
-                    category: selectedCategory.lowercased()
+                    category: selectedCategory.isEmpty ? nil : selectedCategory
                 )
                 
                 await MainActor.run {
@@ -1420,12 +1444,54 @@ struct CardCreationFormView: View {
                     dismiss()
                 }
                 
-                // Show success message or handle the created card
-                print("Card created successfully: \(response.id)")
+                // Convert response to TravelCard and add to store
+                let newCard = TravelCard(
+                    id: Int.random(in: 1000...9999), // Generate local ID since API doesn't return one
+                    destination_name: response.destination_name ?? (destinationName.isEmpty ? nil : destinationName), // Use form value as fallback
+                    image: response.image ?? "placeholder_image", // Use fallback image URL
+                    is_valid_destination: true,
+                    thought: response.thought ?? (thought.isEmpty ? nil : thought), // Use form value as fallback
+                    created_at: ISO8601DateFormatter().string(from: Date()),
+                    updated_at: nil,
+                    like_count: 0,
+                    is_liked: false,
+                    is_owner: true,
+                    is_intrusive_mode: false,
+                    device_destination_name: response.destination_name ?? destinationName,
+                    owner_destination_name: response.destination_name ?? destinationName,
+                    rarity: "common",
+                    collection_tags: [],
+                    category: response.category ?? selectedCategory.lowercased(),
+                    isVerified: false, // New cards start as unverified
+                    s3_url: response.s3_url ?? response.image ?? "placeholder_s3_url",
+                    location: response.location ?? location, // Use form value as fallback
+                    coordinates: response.coordinates,
+                    admin_review_status: "pending", // New cards are pending review
+                    admin_reviewer_id: nil,
+                    admin_reviewed_at: nil,
+                    admin_notes: nil,
+                    check_in_count: 0,
+                    comment_count: 0,
+                    is_liked_by_user: false,
+                    is_checked_in_by_user: false,
+                    moods: [],
+                    user: nil
+                )
+                
+                // Add to store and refresh feed
+                cardStore.addCard(newCard)
+                await cardStore.refreshFeed()
+                
+                // Show success message
+                showSuccessAlert = true
+                
+                print("Card created successfully with local ID: \(newCard.id)")
                 
             } catch {
                 await MainActor.run {
                     isSubmitting = false
+                    errorMessage = error.localizedDescription
+                    showErrorAlert = true
                     // Handle error - show alert or error message
                     print("Error creating card: \(error)")
                 }

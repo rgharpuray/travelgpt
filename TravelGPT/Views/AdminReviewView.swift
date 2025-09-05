@@ -91,7 +91,7 @@ struct AdminCardRow: View {
     var body: some View {
         Button(action: onTap) {
             HStack(spacing: 12) {
-                AsyncImage(url: URL(string: card.image_url)) { image in
+                AsyncImage(url: URL(string: card.image)) { image in
                     image
                         .resizable()
                         .aspectRatio(contentMode: .fill)
@@ -102,12 +102,12 @@ struct AdminCardRow: View {
                 .clipShape(RoundedRectangle(cornerRadius: 8))
                 
                 VStack(alignment: .leading, spacing: 4) {
-                    Text(card.destination_name)
+                    Text(card.destination_name ?? "Unknown Location")
                         .font(.headline)
                         .foregroundColor(.primary)
                         .lineLimit(1)
                     
-                    Text(card.thought)
+                    Text(card.thought ?? "No description")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
                         .lineLimit(2)
@@ -149,16 +149,16 @@ struct AdminCardReviewSheet: View {
         NavigationView {
             ScrollView {
                 VStack(spacing: 20) {
-                    // Card image
-                    AsyncImage(url: URL(string: card.image_url)) { image in
-                        image
-                            .resizable()
-                            .aspectRatio(contentMode: .fill)
-                    } placeholder: {
-                        Color.gray.opacity(0.3)
-                    }
-                    .frame(height: 200)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
+                                    // Card image
+                AsyncImage(url: URL(string: card.image)) { image in
+                    image
+                        .resizable()
+                        .aspectRatio(contentMode: .fill)
+                } placeholder: {
+                    Color.gray.opacity(0.3)
+                }
+                .frame(height: 200)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
                     
                     // Card details
                     VStack(alignment: .leading, spacing: 16) {
@@ -166,7 +166,7 @@ struct AdminCardReviewSheet: View {
                             Text("Destination")
                                 .font(.headline)
                                 .fontWeight(.semibold)
-                            Text(card.destination_name)
+                            Text(card.destination_name ?? "Unknown Location")
                                 .font(.body)
                         }
                         
@@ -174,7 +174,7 @@ struct AdminCardReviewSheet: View {
                             Text("Thought")
                                 .font(.headline)
                                 .fontWeight(.semibold)
-                            Text(card.thought)
+                            Text(card.thought ?? "No description")
                                 .font(.body)
                         }
                         

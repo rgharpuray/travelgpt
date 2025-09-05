@@ -27,22 +27,70 @@ struct RarityBadge: View {
     
     var body: some View {
         ZStack {
-            // Background glow for rare/legendary
+            // Enhanced background glow for rare/legendary
             if rarity.sparkleEffect {
                 Circle()
                     .fill(rarity.gradient)
-                    .frame(width: size.backgroundSize + 8, height: size.backgroundSize + 8)
-                    .blur(radius: 4)
-                    .opacity(0.4)
+                    .frame(width: size.backgroundSize + 12, height: size.backgroundSize + 12)
+                    .blur(radius: 6)
+                    .opacity(0.6)
+                    .scaleEffect(1.1)
+                    .animation(
+                        .easeInOut(duration: 2).repeatForever(autoreverses: true),
+                        value: rarity.sparkleEffect
+                    )
+                
+                // Additional sparkle rings for legendary
+                if rarity == .legendary {
+                    Circle()
+                        .strokeBorder(rarity.gradient, lineWidth: 2)
+                        .frame(width: size.backgroundSize + 16, height: size.backgroundSize + 16)
+                        .blur(radius: 2)
+                        .opacity(0.8)
+                        .scaleEffect(1.2)
+                        .animation(
+                            .easeInOut(duration: 3).repeatForever(autoreverses: true),
+                            value: rarity.sparkleEffect
+                        )
+                }
             }
             
+            // Main badge background with gradient
+            Circle()
+                .fill(
+                    LinearGradient(
+                        colors: [
+                            Color.white.opacity(0.95),
+                            Color.white.opacity(0.85)
+                        ],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: size.backgroundSize, height: size.backgroundSize)
+                .overlay(
+                    Circle()
+                        .strokeBorder(
+                            rarity.gradient,
+                            lineWidth: rarity.sparkleEffect ? 2 : 1.5
+                        )
+                )
+                .shadow(
+                    color: rarity.color.opacity(0.3),
+                    radius: rarity.sparkleEffect ? 4 : 2,
+                    x: 0,
+                    y: 2
+                )
+            
+            // Icon with enhanced styling
             Image(systemName: rarity.icon)
                 .foregroundColor(rarity.color)
-                .font(.system(size: size.iconSize, weight: .medium))
-                .background(
-                    Circle()
-                        .fill(Color.white.opacity(0.95))
-                        .frame(width: size.backgroundSize, height: size.backgroundSize)
+                .font(.system(size: size.iconSize, weight: .bold))
+                .shadow(
+                    color: rarity.color.opacity(0.3),
+                    radius: 1,
+                    x: 0,
+                    y: 1
                 )
         }
     }
@@ -58,23 +106,89 @@ struct CollectionTag: View {
         self.isCompact = isCompact
     }
     
-    var body: some View {
-        Text(tag)
-            .font(isCompact ? .caption2 : .caption)
-            .fontWeight(.medium)
-            .foregroundColor(.white)
-            .padding(.horizontal, isCompact ? 6 : 8)
-            .padding(.vertical, isCompact ? 2 : 4)
-            .background(
-                Capsule()
-                    .fill(
-                        LinearGradient(
-                            colors: [Color.blue.opacity(0.6), Color.purple.opacity(0.4)],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
+    private var tagGradient: LinearGradient {
+        // Create different gradients based on tag content for variety
+        let tagLower = tag.lowercased()
+        if tagLower.contains("beach") || tagLower.contains("ocean") || tagLower.contains("sea") {
+            return LinearGradient(
+                colors: [Color.cyan.opacity(0.8), Color.blue.opacity(0.6)],
+                startPoint: .leading,
+                endPoint: .trailing
             )
+        } else if tagLower.contains("mountain") || tagLower.contains("hiking") || tagLower.contains("nature") {
+            return LinearGradient(
+                colors: [Color.green.opacity(0.7), Color.mint.opacity(0.6)],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+        } else if tagLower.contains("city") || tagLower.contains("urban") || tagLower.contains("downtown") {
+            return LinearGradient(
+                colors: [Color.purple.opacity(0.7), Color.indigo.opacity(0.6)],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+        } else if tagLower.contains("food") || tagLower.contains("restaurant") || tagLower.contains("cuisine") {
+            return LinearGradient(
+                colors: [Color.orange.opacity(0.7), Color.red.opacity(0.6)],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+        } else {
+            return LinearGradient(
+                colors: [Color.blue.opacity(0.7), Color.purple.opacity(0.6)],
+                startPoint: .leading,
+                endPoint: .trailing
+            )
+        }
+    }
+    
+    var body: some View {
+        HStack(spacing: 4) {
+            // Travel-themed icon based on tag
+            Image(systemName: tagIcon)
+                .font(.system(size: isCompact ? 8 : 10, weight: .medium))
+                .foregroundColor(.white.opacity(0.9))
+            
+            Text(tag)
+                .font(isCompact ? .caption2 : .caption)
+                .fontWeight(.semibold)
+                .foregroundColor(.white)
+        }
+        .padding(.horizontal, isCompact ? 8 : 10)
+        .padding(.vertical, isCompact ? 3 : 5)
+        .background(
+            Capsule()
+                .fill(tagGradient)
+                .overlay(
+                    Capsule()
+                        .strokeBorder(Color.white.opacity(0.2), lineWidth: 0.5)
+                )
+                .shadow(
+                    color: Color.black.opacity(0.1),
+                    radius: 2,
+                    x: 0,
+                    y: 1
+                )
+        )
+    }
+    
+    private var tagIcon: String {
+        let tagLower = tag.lowercased()
+        if tagLower.contains("beach") || tagLower.contains("ocean") || tagLower.contains("sea") {
+            return "wave.3.right"
+        } else if tagLower.contains("mountain") || tagLower.contains("hiking") || tagLower.contains("nature") {
+            return "mountain.2"
+        } else if tagLower.contains("city") || tagLower.contains("urban") || tagLower.contains("downtown") {
+            return "building.2"
+        } else if tagLower.contains("food") || tagLower.contains("restaurant") || tagLower.contains("cuisine") {
+            return "fork.knife"
+        } else if tagLower.contains("culture") || tagLower.contains("museum") || tagLower.contains("art") {
+            return "paintbrush"
+        } else if tagLower.contains("adventure") || tagLower.contains("extreme") || tagLower.contains("sport") {
+            return "figure.hiking"
+        } else {
+            return "location"
+        }
     }
 }
 

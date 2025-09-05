@@ -2,7 +2,7 @@ import Foundation
 
 struct Config {
     // MARK: - API Configuration
-    static let apiBaseURL = "https://yourdomain.com/api/travel"
+    static let apiBaseURL = "http://localhost:8000/postcardgpt"
     static let apiTimeout: TimeInterval = 30.0
     
     // MARK: - AWS S3 Configuration

@@ -35,7 +35,7 @@ struct TravelCardView: View {
             // Main image with overlays
             ZStack(alignment: .top) {
                 // Dog image fills most of the card
-                AsyncImageView(url: URL(string: card.image_url))
+                AsyncImageView(url: URL(string: card.image))
                     .aspectRatio(3/4, contentMode: .fill)
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
                     .clipped()
@@ -85,7 +85,7 @@ struct TravelCardView: View {
                     
                     // Thought bubble
                     HStack {
-                        Text(card.thought)
+                        Text(card.thought ?? "No description")
                             .font(.body)
                             .italic()
                             .foregroundColor(.black)
@@ -115,7 +115,7 @@ struct TravelCardView: View {
     TravelCardView(card: TravelCard(
         id: 1,
         destination_name: "Argos",
-        image_url: "https://images.dog.ceo/breeds/hound-afghan/n02088094_1003.jpg",
+                    image: "https://images.dog.ceo/breeds/hound-afghan/n02088094_1003.jpg",
         is_valid_destination: true,
         thought: "I want a treat!",
         created_at: "2024-01-01T00:00:00Z",

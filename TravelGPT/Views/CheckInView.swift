@@ -24,7 +24,7 @@ struct CheckInView: View {
                             .font(.title)
                             .fontWeight(.bold)
                         
-                        Text("You're at \(card.destination_name)!")
+                        Text("You're at \(card.destination_name ?? "Unknown Location")!")
                             .font(.title3)
                             .foregroundColor(.secondary)
                             .multilineTextAlignment(.center)
@@ -38,7 +38,7 @@ struct CheckInView: View {
                             .fontWeight(.semibold)
                             .frame(maxWidth: .infinity, alignment: .leading)
                         
-                        AsyncImage(url: URL(string: card.image_url)) { image in
+                        AsyncImage(url: URL(string: card.image)) { image in
                             image
                                 .resizable()
                                 .aspectRatio(contentMode: .fill)
@@ -49,11 +49,11 @@ struct CheckInView: View {
                         .clipShape(RoundedRectangle(cornerRadius: 12))
                         
                         VStack(alignment: .leading, spacing: 8) {
-                            Text(card.destination_name)
+                            Text(card.destination_name ?? "Unknown Location")
                                 .font(.title3)
                                 .fontWeight(.semibold)
                             
-                            Text(card.thought)
+                            Text(card.thought ?? "No description")
                                 .font(.body)
                                 .foregroundColor(.secondary)
                                 .lineLimit(3)
@@ -222,7 +222,7 @@ class CheckInStore: ObservableObject {
     CheckInView(card: TravelCard(
         id: 1,
         destination_name: "Sagrada Familia",
-        image_url: "https://example.com/image.jpg",
+                    image: "https://example.com/image.jpg",
         is_valid_destination: true,
         thought: "Amazing architecture!",
         created_at: "2025-01-15T10:30:00Z",

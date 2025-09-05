@@ -1227,8 +1227,8 @@ struct CollectionPreviewCard: View {
     var body: some View {
         VStack(spacing: 6) {
             ZStack {
-                if let card = firstCard, !card.image_url.isEmpty {
-                    AsyncImageView(url: URL(string: card.image_url))
+                if let card = firstCard, !card.image.isEmpty {
+                    AsyncImageView(url: URL(string: card.image))
                         .aspectRatio(contentMode: .fill)
                         .frame(width: 50, height: 50)
                         .clipShape(RoundedRectangle(cornerRadius: 12))
