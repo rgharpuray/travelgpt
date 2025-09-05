@@ -24,11 +24,11 @@ struct TravelCardView: View {
                 .background(
                     RoundedRectangle(cornerRadius: 28)
                         .fill(
-                            card.rarityEnum?.color.opacity(0.05) ?? Color.gray.opacity(0.05)
+                            card.themeColor?.opacity(0.1) ?? card.rarityEnum?.color.opacity(0.05) ?? Color.gray.opacity(0.05)
                         )
                 )
                 .shadow(
-                    color: card.rarityEnum?.color.opacity(0.2) ?? Color.gray.opacity(0.1),
+                    color: card.themeColor?.opacity(0.3) ?? card.rarityEnum?.color.opacity(0.2) ?? Color.gray.opacity(0.1),
                     radius: card.rarityEnum?.sparkleEffect == true ? 8 : 4
                 )
             

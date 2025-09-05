@@ -22,6 +22,8 @@ struct TravelCard: Identifiable, Codable {
     let user: UserResponse?
     let device_id: String?
     let moods: [String]
+    let theme_color: String?
+    
     
     // Computed properties for backward compatibility
     var is_valid_destination: Bool { true }
@@ -59,6 +61,12 @@ struct TravelCard: Identifiable, Codable {
         return AdminReviewStatus(rawValue: status) ?? .unknown
     }
     
+    // Computed property for theme color
+    var themeColor: Color? {
+        guard let colorString = theme_color else { return nil }
+        return Color(hex: colorString)
+    }
+    
     // Custom initializer for backward compatibility with existing code
     init(id: Int, destination_name: String?, image: String, is_valid_destination: Bool, thought: String?, 
          created_at: String, updated_at: String?, like_count: Int, is_liked: Bool, is_owner: Bool?, 
@@ -68,7 +76,7 @@ struct TravelCard: Identifiable, Codable {
          coordinates: String? = nil, admin_review_status: String? = nil, admin_reviewer_id: Int? = nil, 
          admin_reviewed_at: String? = nil, admin_notes: String? = nil, check_in_count: Int? = nil, 
          comment_count: Int? = nil, is_liked_by_user: Bool? = nil, is_checked_in_by_user: Bool? = nil, 
-         moods: [String]? = nil, user: UserResponse? = nil, device_id: String? = nil) {
+         moods: [String]? = nil, user: UserResponse? = nil, device_id: String? = nil, theme_color: String? = nil) {
         self.id = id
         self.destination_name = destination_name
         self.image = image
@@ -88,6 +96,7 @@ struct TravelCard: Identifiable, Codable {
         self.user = user
         self.device_id = device_id
         self.moods = moods ?? []
+        self.theme_color = theme_color
     }
 }
 

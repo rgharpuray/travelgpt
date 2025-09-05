@@ -353,7 +353,9 @@ class TravelCardAPIService {
             is_liked_by_user: nil,
             is_checked_in_by_user: nil,
             moods: nil,
-            user: nil
+            user: nil,
+            device_id: nil,
+            theme_color: nil
         )
     }
     

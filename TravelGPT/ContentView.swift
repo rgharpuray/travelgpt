@@ -98,7 +98,8 @@ struct ContentView: View {
             is_liked_by_user: false,
             is_checked_in_by_user: false,
             moods: ["adventure", "nature"],
-            user: UserResponse(id: 1, username: "traveler123", first_name: "John", last_name: "Doe", email: "john@example.com")
+            user: UserResponse(id: 1, username: "traveler123", first_name: "John", last_name: "Doe", email: "john@example.com"),
+            theme_color: "#4ECDC4"
         ),
         TravelCard(
             id: 2,
@@ -134,7 +135,8 @@ struct ContentView: View {
             is_liked_by_user: true,
             is_checked_in_by_user: false,
             moods: ["history", "sports"],
-            user: UserResponse(id: 2, username: "olympicfan", first_name: "Sarah", last_name: "Smith", email: "sarah@example.com")
+            user: UserResponse(id: 2, username: "olympicfan", first_name: "Sarah", last_name: "Smith", email: "sarah@example.com"),
+            theme_color: "#FF6B6B"
         ),
         TravelCard(
             id: 3,
@@ -170,7 +172,8 @@ struct ContentView: View {
             is_liked_by_user: false,
             is_checked_in_by_user: false,
             moods: ["festival", "fun"],
-            user: UserResponse(id: 3, username: "festivallover", first_name: "Maria", last_name: "Garcia", email: "maria@example.com")
+            user: UserResponse(id: 3, username: "festivallover", first_name: "Maria", last_name: "Garcia", email: "maria@example.com"),
+            theme_color: "#FF8E53"
         ),
         TravelCard(
             id: 4,
@@ -628,7 +631,7 @@ struct SimpleTravelCardView: View {
                 .frame(height: 250)
                 .clipped()
             
-            // Content section
+            // Content section with theme color background
             VStack(alignment: .leading, spacing: 16) {
                 // Location and thought
                 VStack(alignment: .leading, spacing: 8) {
@@ -757,11 +760,11 @@ struct SimpleTravelCardView: View {
                 .padding(.horizontal, 20)
                 .padding(.bottom, 20)
             }
-            .background(Color.white)
+            .background(card.themeColor?.opacity(0.1) ?? Color.white)
         }
-        .background(Color.white)
+        .background(card.themeColor?.opacity(0.1) ?? Color.white)
         .cornerRadius(16)
-        .shadow(color: Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
+        .shadow(color: card.themeColor?.opacity(0.2) ?? Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
         .sheet(isPresented: $showCheckInSheet) {
             CheckInView(card: card)
         }
