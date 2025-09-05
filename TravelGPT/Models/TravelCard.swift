@@ -141,6 +141,8 @@ class CardStore: ObservableObject {
     @Published var dailyIntrusiveCount: Int = 0
     @Published var feedType: FeedType = .all
     @Published var isIntrusiveMode: Bool = false
+    @Published var selectedMoods: [String] = []
+    @Published var selectedLocation: String = "Barcelona, Spain"
     
     var filteredCards: [TravelCard] {
         cards.filter { $0.is_intrusive_mode == isIntrusiveMode }
@@ -216,7 +218,12 @@ class CardStore: ObservableObject {
             do {
                 // Use the /discovery/ endpoint for the main feed since it's working
                 print("📡 Fetching cards from /discovery/ endpoint")
-                let response = try await TravelCardAPIService.shared.getCards(page: 1, pageSize: self.pageSize)
+                let response = try await TravelCardAPIService.shared.getCards(
+                    location: self.selectedLocation,
+                    moods: self.selectedMoods.isEmpty ? nil : self.selectedMoods,
+                    page: 1, 
+                    pageSize: self.pageSize
+                )
                 print("📦 Received \(response.results.count) cards from API (pageSize: \(self.pageSize))")
                 
                 await MainActor.run {
@@ -297,7 +304,12 @@ class CardStore: ObservableObject {
         do {
             let nextPage = currentPage + 1
             print("📡 Fetching page \(nextPage) with pageSize \(pageSize)")
-            let response = try await TravelCardAPIService.shared.getCards(page: nextPage, pageSize: pageSize)
+            let response = try await TravelCardAPIService.shared.getCards(
+                location: selectedLocation,
+                moods: selectedMoods.isEmpty ? nil : selectedMoods,
+                page: nextPage, 
+                pageSize: pageSize
+            )
             print("📦 Received \(response.results.count) new cards from page \(nextPage)")
             
             if response.results.count < pageSize {

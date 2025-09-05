@@ -97,7 +97,7 @@ struct ContentView: View {
             comment_count: 8,
             is_liked_by_user: false,
             is_checked_in_by_user: false,
-            moods: ["adventure", "nature"],
+            moods: ["Adventure", "Nature", "Excited"],
             user: UserResponse(id: 1, username: "traveler123", first_name: "John", last_name: "Doe", email: "john@example.com"),
             theme_color: "#4ECDC4"
         ),
@@ -134,7 +134,7 @@ struct ContentView: View {
             comment_count: 12,
             is_liked_by_user: true,
             is_checked_in_by_user: false,
-            moods: ["history", "sports"],
+            moods: ["History", "Sports", "Energetic"],
             user: UserResponse(id: 2, username: "olympicfan", first_name: "Sarah", last_name: "Smith", email: "sarah@example.com"),
             theme_color: "#FF6B6B"
         ),
@@ -285,40 +285,13 @@ struct ContentView: View {
         )
     ]
     
-    // Filtered cards based on category, mood, and search
+    // Filtered cards based on category and search (mood filtering is now handled by API)
     private var filteredCards: [TravelCard] {
         var filtered = cardStore.cards
         
         // Filter by category
         if selectedCategory != "all" {
             filtered = filtered.filter { $0.category == selectedCategory }
-        }
-        
-        // Filter by mood (if selected)
-        if let selectedMood = selectedMood {
-            filtered = filtered.filter { card in
-                // For now, we'll filter based on the card's thought content
-                // In a real app, cards would have mood tags
-                let thought = (card.thought ?? "").lowercased()
-                switch selectedMood {
-                case .excited:
-                    return thought.contains("amazing") || thought.contains("incredible") || thought.contains("thrilling")
-                case .relaxed:
-                    return thought.contains("peaceful") || thought.contains("quiet") || thought.contains("calm")
-                case .adventurous:
-                    return thought.contains("hiking") || thought.contains("trail") || thought.contains("adventure")
-                case .curious:
-                    return thought.contains("museum") || thought.contains("historical") || thought.contains("cultural")
-                case .hungry:
-                    return thought.contains("restaurant") || thought.contains("food") || thought.contains("sushi")
-                case .energetic:
-                    return thought.contains("crossing") || thought.contains("busy") || thought.contains("vibrant")
-                case .romantic:
-                    return thought.contains("beautiful") || thought.contains("scenic") || thought.contains("romantic")
-                case .social:
-                    return thought.contains("market") || thought.contains("crowd") || thought.contains("people")
-                }
-            }
         }
         
         // Filter by search text
@@ -352,16 +325,40 @@ struct ContentView: View {
                         Button(action: {
                             showLocationPicker = true
                         }) {
-                                                    HStack(spacing: 8) {
-                            Image(systemName: "mappin.circle.fill")
-                                .foregroundColor(.black)
-                                .font(.title3)
-                            
-                            Text(currentLocation)
-                                .font(.subheadline)
-                                .fontWeight(.medium)
-                                .foregroundColor(.primary)
+                            HStack(spacing: 8) {
+                                Image(systemName: "mappin.circle.fill")
+                                    .foregroundColor(.black)
+                                    .font(.title3)
+                                
+                                Text(currentLocation)
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.primary)
+                            }
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 12)
                         }
+                        .buttonStyle(PlainButtonStyle())
+                        
+                        // Divider
+                        Rectangle()
+                            .fill(Color(.systemGray4))
+                            .frame(width: 1, height: 24)
+                        
+                        // Map button
+                        Button(action: {
+                            showMapView = true
+                        }) {
+                            HStack(spacing: 8) {
+                                Image(systemName: "map.fill")
+                                    .foregroundColor(Color(red: 0.85, green: 0.25, blue: 0.25))
+                                    .font(.title3)
+                                
+                                Text("Map")
+                                    .font(.subheadline)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(Color(red: 0.85, green: 0.25, blue: 0.25))
+                            }
                             .padding(.horizontal, 16)
                             .padding(.vertical, 12)
                         }
@@ -426,6 +423,16 @@ struct ContentView: View {
                                 Button(action: {
                                     withAnimation(.easeInOut(duration: 0.2)) {
                                         selectedMood = selectedMood == mood ? nil : mood
+                                        // Update CardStore with selected moods
+                                        if let selectedMood = selectedMood {
+                                            cardStore.selectedMoods = [selectedMood.rawValue]
+                                        } else {
+                                            cardStore.selectedMoods = []
+                                        }
+                                        // Refresh feed with new mood filter
+                                        Task {
+                                            await cardStore.refreshFeed()
+                                        }
                                     }
                                 }) {
                                     HStack(spacing: 6) {
@@ -523,7 +530,16 @@ struct ContentView: View {
                 ProfileView()
             }
             .sheet(isPresented: $showMapView) {
-                SimpleMapView(cards: sampleCards)
+                LocationMapView(currentLocation: $currentLocation)
+                    .onDisappear {
+                        // Update CardStore location and refresh feed when location changes
+                        if cardStore.selectedLocation != currentLocation {
+                            cardStore.selectedLocation = currentLocation
+                            Task {
+                                await cardStore.refreshFeed()
+                            }
+                        }
+                    }
             }
             .sheet(isPresented: $showLocationPicker) {
                 LocationPickerView(selectedLocation: $currentLocation)
@@ -545,6 +561,8 @@ struct ContentView: View {
         }
         .navigationViewStyle(.stack)
         .onAppear {
+            // Initialize CardStore location with current location
+            cardStore.selectedLocation = currentLocation
             Task {
                 await cardStore.refreshFeed()
             }
@@ -645,6 +663,37 @@ struct SimpleTravelCardView: View {
                             Image(systemName: "checkmark.seal.fill")
                                 .foregroundColor(.blue)
                                 .font(.caption)
+                        }
+                    }
+                    
+                    // Mood tags - non-intrusive display
+                    if !card.moods.isEmpty {
+                        HStack(spacing: 6) {
+                            ForEach(card.moods.prefix(3), id: \.self) { mood in
+                                Text(mood)
+                                    .font(.caption2)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.secondary)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .fill(Color(.systemGray6))
+                                    )
+                            }
+                            
+                            if card.moods.count > 3 {
+                                Text("+\(card.moods.count - 3)")
+                                    .font(.caption2)
+                                    .fontWeight(.medium)
+                                    .foregroundColor(.secondary)
+                                    .padding(.horizontal, 8)
+                                    .padding(.vertical, 4)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 8)
+                                            .fill(Color(.systemGray6))
+                                    )
+                            }
                         }
                     }
                     
@@ -774,35 +823,409 @@ struct SimpleTravelCardView: View {
     }
 }
 
-// MARK: - Simple Map View
+// MARK: - Featured City Model
 
-struct SimpleMapView: View {
-    let cards: [TravelCard]
+struct FeaturedCity: Identifiable {
+    let id = UUID()
+    let name: String
+    let coordinate: CLLocationCoordinate2D
+}
+
+// MARK: - Location Map View
+
+import MapKit
+import CoreLocation
+
+struct LocationMapView: View {
     @Environment(\.dismiss) private var dismiss
+    @StateObject private var locationManager = LocationManager()
+    @State private var selectedLocation: String
+    @Binding var currentLocation: String
+    @State private var region = MKCoordinateRegion(
+        center: CLLocationCoordinate2D(latitude: 36.0, longitude: 138.0), // Japan center
+        span: MKCoordinateSpan(latitudeDelta: 15.0, longitudeDelta: 15.0) // Japan view
+    )
+    @State private var showingLocationPermissionAlert = false
+    
+    init(currentLocation: Binding<String>) {
+        self._currentLocation = currentLocation
+        self._selectedLocation = State(initialValue: currentLocation.wrappedValue)
+    }
+    
+    // Top 12 Japanese cities with coordinates and Japanese names
+    private let featuredCities: [FeaturedCity] = [
+        FeaturedCity(name: "Tokyo (東京)", coordinate: CLLocationCoordinate2D(latitude: 35.6762, longitude: 139.6503)),
+        FeaturedCity(name: "Osaka (大阪)", coordinate: CLLocationCoordinate2D(latitude: 34.6937, longitude: 135.5023)),
+        FeaturedCity(name: "Kyoto (京都)", coordinate: CLLocationCoordinate2D(latitude: 35.0116, longitude: 135.7681)),
+        FeaturedCity(name: "Yokohama (横浜)", coordinate: CLLocationCoordinate2D(latitude: 35.4437, longitude: 139.6380)),
+        FeaturedCity(name: "Nagoya (名古屋)", coordinate: CLLocationCoordinate2D(latitude: 35.1815, longitude: 136.9066)),
+        FeaturedCity(name: "Sapporo (札幌)", coordinate: CLLocationCoordinate2D(latitude: 43.0642, longitude: 141.3469)),
+        FeaturedCity(name: "Fukuoka (福岡)", coordinate: CLLocationCoordinate2D(latitude: 33.5904, longitude: 130.4017)),
+        FeaturedCity(name: "Kobe (神戸)", coordinate: CLLocationCoordinate2D(latitude: 34.6901, longitude: 135.1956)),
+        FeaturedCity(name: "Hiroshima (広島)", coordinate: CLLocationCoordinate2D(latitude: 34.3853, longitude: 132.4553)),
+        FeaturedCity(name: "Sendai (仙台)", coordinate: CLLocationCoordinate2D(latitude: 38.2682, longitude: 140.8694)),
+        FeaturedCity(name: "Nara (奈良)", coordinate: CLLocationCoordinate2D(latitude: 34.6851, longitude: 135.8050)),
+        FeaturedCity(name: "Kanazawa (金沢)", coordinate: CLLocationCoordinate2D(latitude: 36.5613, longitude: 136.6562))
+    ]
     
     var body: some View {
         NavigationView {
-            VStack(spacing: 20) {
-                Text("🗺️ Travel Map")
-                    .font(.title)
-                    .fontWeight(.bold)
+            VStack(spacing: 0) {
+                // Map
+                Map(coordinateRegion: $region, annotationItems: featuredCities) { city in
+                    MapAnnotation(coordinate: city.coordinate) {
+                        Button(action: {
+                            selectedLocation = city.name
+                            withAnimation(.easeInOut(duration: 0.5)) {
+                                region.center = city.coordinate
+                                region.span = MKCoordinateSpan(latitudeDelta: 2.0, longitudeDelta: 2.0)
+                            }
+                        }) {
+                            VStack(spacing: 4) {
+                                ZStack {
+                                    // Clean outer ring for selected city
+                                    if selectedLocation == city.name {
+                                        Circle()
+                                            .stroke(Color.red.opacity(0.4), lineWidth: 3)
+                                            .frame(width: 50, height: 50)
+                                            .scaleEffect(1.2)
+                                            .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: selectedLocation)
+                                    }
+                                    
+                                    // Clean Japanese-style pin
+                                    Circle()
+                                        .fill(selectedLocation == city.name ? Color.red : Color.white)
+                                        .frame(width: 28, height: 28)
+                                        .overlay(
+                                            Circle()
+                                                .stroke(Color.red, lineWidth: 2)
+                                        )
+                                        .shadow(color: Color.black.opacity(0.3), radius: 4, x: 0, y: 2)
+                                    
+                                    // Simple dot for selected, circle for unselected
+                                    Circle()
+                                        .fill(selectedLocation == city.name ? Color.white : Color.red)
+                                        .frame(width: selectedLocation == city.name ? 8 : 6, height: selectedLocation == city.name ? 8 : 6)
+                                }
+                                
+                                // Clean city label - only show when selected to avoid overlap
+                                if selectedLocation == city.name {
+                                    Text(city.name.components(separatedBy: " (").first ?? "")
+                                        .font(.caption)
+                                        .fontWeight(.bold)
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, 10)
+                                        .padding(.vertical, 6)
+                                        .background(
+                                            Capsule()
+                                                .fill(Color.red)
+                                                .shadow(color: Color.black.opacity(0.3), radius: 3, x: 0, y: 1)
+                                        )
+                                }
+                            }
+                        }
+                    }
+                }
+                .frame(maxWidth: .infinity, maxHeight: .infinity)
+                .overlay(
+                    // Zoom controls
+                    VStack {
+                        Spacer()
+                        HStack {
+                            Spacer()
+                            VStack(spacing: 2) {
+                                // Clean zoom in button
+                                Button(action: {
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        // Limit minimum zoom in to prevent crashes
+                                        let minSpan: Double = 0.5
+                                        region.span.latitudeDelta = max(region.span.latitudeDelta * 0.5, minSpan)
+                                        region.span.longitudeDelta = max(region.span.longitudeDelta * 0.5, minSpan)
+                                    }
+                                }) {
+                                    Image(systemName: "plus")
+                                        .font(.system(size: 18, weight: .semibold))
+                                        .foregroundColor(region.span.latitudeDelta <= 0.5 ? .gray : .white)
+                                        .frame(width: 50, height: 50)
+                                        .background(
+                                            Circle()
+                                                .fill(region.span.latitudeDelta <= 0.5 ? 
+                                                      Color.gray.opacity(0.3) : 
+                                                      Color.red)
+                                                .overlay(
+                                                    Circle()
+                                                        .stroke(Color.white, lineWidth: 2)
+                                                )
+                                                .shadow(color: Color.black.opacity(0.3), radius: 6, x: 0, y: 3)
+                                        )
+                                }
+                                .disabled(region.span.latitudeDelta <= 0.5)
+                                
+                                // Clean zoom out button
+                                Button(action: {
+                                    withAnimation(.easeInOut(duration: 0.3)) {
+                                        // Limit maximum zoom out to prevent crashes
+                                        let maxSpan: Double = 30.0
+                                        region.span.latitudeDelta = min(region.span.latitudeDelta * 2.0, maxSpan)
+                                        region.span.longitudeDelta = min(region.span.longitudeDelta * 2.0, maxSpan)
+                                    }
+                                }) {
+                                    Image(systemName: "minus")
+                                        .font(.system(size: 18, weight: .semibold))
+                                        .foregroundColor(region.span.latitudeDelta >= 30.0 ? .gray : .white)
+                                        .frame(width: 50, height: 50)
+                                        .background(
+                                            Circle()
+                                                .fill(region.span.latitudeDelta >= 30.0 ? 
+                                                      Color.gray.opacity(0.3) : 
+                                                      Color.red)
+                                                .overlay(
+                                                    Circle()
+                                                        .stroke(Color.white, lineWidth: 2)
+                                                )
+                                                .shadow(color: Color.black.opacity(0.3), radius: 6, x: 0, y: 3)
+                                        )
+                                }
+                                .disabled(region.span.latitudeDelta >= 30.0)
+                            }
+                            .padding(.trailing, 20)
+                            .padding(.bottom, 100) // Above the bottom panel
+                        }
+                    }
+                )
                 
-                Text("Map view coming soon!")
-                    .font(.body)
-                    .foregroundColor(.secondary)
-                
-                Spacer()
+                // Clean white/red bottom panel
+                VStack(spacing: 0) {
+                    // Clean white background
+                    Color.white
+                        .frame(height: 200)
+                        .overlay(
+                            VStack(spacing: 20) {
+                                // Clean selected location card
+                                VStack(spacing: 12) {
+                                    HStack {
+                                        // Clean location icon
+                                        Circle()
+                                            .fill(Color.red)
+                                            .frame(width: 40, height: 40)
+                                            .overlay(
+                                                Circle()
+                                                    .stroke(Color.white, lineWidth: 2)
+                                            )
+                                            .overlay(
+                                                Image(systemName: "location.fill")
+                                                    .font(.system(size: 16, weight: .bold))
+                                                    .foregroundColor(.white)
+                                            )
+                                        
+                                        VStack(alignment: .leading, spacing: 2) {
+                                            Text("Selected Location")
+                                                .font(.caption)
+                                                .fontWeight(.medium)
+                                                .foregroundColor(.gray)
+                                            
+                                            Text(selectedLocation.components(separatedBy: " (").first ?? "")
+                                                .font(.title3)
+                                                .fontWeight(.bold)
+                                                .foregroundColor(.black)
+                                        }
+                                        
+                                        Spacer()
+                                        
+                                        // Clean select button
+                                        Button(action: {
+                                            currentLocation = selectedLocation
+                                            dismiss()
+                                        }) {
+                                            HStack(spacing: 6) {
+                                                Text("Select")
+                                                    .font(.headline)
+                                                    .fontWeight(.semibold)
+                                                Image(systemName: "checkmark")
+                                                    .font(.headline)
+                                                    .fontWeight(.semibold)
+                                            }
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, 20)
+                                            .padding(.vertical, 12)
+                                            .background(
+                                                RoundedRectangle(cornerRadius: 12)
+                                                    .fill(Color.red)
+                                                    .shadow(color: Color.red.opacity(0.3), radius: 4, x: 0, y: 2)
+                                            )
+                                        }
+                                    }
+                                    .padding(.horizontal, 20)
+                                    .padding(.vertical, 16)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 16)
+                                            .fill(Color.gray.opacity(0.1))
+                                            .overlay(
+                                                RoundedRectangle(cornerRadius: 16)
+                                                    .stroke(Color.red.opacity(0.2), lineWidth: 1)
+                                            )
+                                    )
+                                }
+                                
+                                // Clean action buttons
+                                HStack(spacing: 12) {
+                                    // Current location button
+                                    Button(action: {
+                                        if locationManager.authorizationStatus == .authorizedWhenInUse || 
+                                           locationManager.authorizationStatus == .authorizedAlways {
+                                            locationManager.requestLocation()
+                                        } else {
+                                            showingLocationPermissionAlert = true
+                                        }
+                                    }) {
+                                        HStack(spacing: 8) {
+                                            Image(systemName: "location.fill")
+                                                .font(.system(size: 16, weight: .semibold))
+                                            Text("My Location")
+                                                .font(.subheadline)
+                                                .fontWeight(.semibold)
+                                        }
+                                        .foregroundColor(.white)
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 14)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .fill(Color.blue)
+                                                .shadow(color: Color.blue.opacity(0.3), radius: 4, x: 0, y: 2)
+                                        )
+                                    }
+                                    
+                                    // Show all Japan button
+                                    Button(action: {
+                                        withAnimation(.easeInOut(duration: 0.5)) {
+                                            region.center = CLLocationCoordinate2D(latitude: 36.0, longitude: 138.0)
+                                            region.span = MKCoordinateSpan(latitudeDelta: 15.0, longitudeDelta: 15.0)
+                                        }
+                                    }) {
+                                        HStack(spacing: 8) {
+                                            Image(systemName: "globe")
+                                                .font(.system(size: 16, weight: .semibold))
+                                            Text("All Japan")
+                                                .font(.subheadline)
+                                                .fontWeight(.semibold)
+                                        }
+                                        .foregroundColor(.white)
+                                        .frame(maxWidth: .infinity)
+                                        .padding(.vertical, 14)
+                                        .background(
+                                            RoundedRectangle(cornerRadius: 12)
+                                                .fill(Color.red)
+                                                .shadow(color: Color.red.opacity(0.3), radius: 4, x: 0, y: 2)
+                                        )
+                                    }
+                                }
+                            }
+                            .padding(.horizontal, 20)
+                            .padding(.top, 20)
+                        )
+                }
             }
-            .padding()
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button("Done") {
+                ToolbarItem(placement: .navigationBarLeading) {
+                    Button(action: {
                         dismiss()
+                    }) {
+                        HStack(spacing: 6) {
+                            Image(systemName: "xmark")
+                                .font(.system(size: 16, weight: .semibold))
+                            Text("Cancel")
+                                .font(.headline)
+                                .fontWeight(.semibold)
+                        }
+                        .foregroundColor(Color(red: 0.85, green: 0.25, blue: 0.25))
+                    }
+                }
+                ToolbarItem(placement: .principal) {
+                    VStack(spacing: 2) {
+                        Text("Choose Location")
+                            .font(.headline)
+                            .fontWeight(.bold)
+                        Text("Select your destination")
+                            .font(.caption)
+                            .foregroundColor(.secondary)
                     }
                 }
             }
+            .onAppear {
+                // Start with Japan view showing all Japanese cities
+                region.center = CLLocationCoordinate2D(latitude: 36.0, longitude: 138.0)
+                region.span = MKCoordinateSpan(latitudeDelta: 15.0, longitudeDelta: 15.0)
+            }
+            .onChange(of: locationManager.currentLocation) { location in
+                if let location = location {
+                    withAnimation(.easeInOut(duration: 0.5)) {
+                        region.center = location.coordinate
+                        region.span = MKCoordinateSpan(latitudeDelta: 0.1, longitudeDelta: 0.1)
+                    }
+                    
+                    // Find the closest featured city
+                    let closestCity = featuredCities.min { city1, city2 in
+                        let distance1 = location.distance(from: CLLocation(latitude: city1.coordinate.latitude, longitude: city1.coordinate.longitude))
+                        let distance2 = location.distance(from: CLLocation(latitude: city2.coordinate.latitude, longitude: city2.coordinate.longitude))
+                        return distance1 < distance2
+                    }
+                    
+                    if let closestCity = closestCity {
+                        selectedLocation = closestCity.name
+                    }
+                }
+            }
+            .alert("Location Permission Required", isPresented: $showingLocationPermissionAlert) {
+                Button("Settings") {
+                    if let settingsUrl = URL(string: UIApplication.openSettingsURLString) {
+                        UIApplication.shared.open(settingsUrl)
+                    }
+                }
+                Button("Cancel", role: .cancel) { }
+            } message: {
+                Text("Please enable location services in Settings to use your current location.")
+            }
         }
+    }
+}
+
+// MARK: - Location Manager
+
+class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
+    private let locationManager = CLLocationManager()
+    @Published var currentLocation: CLLocation?
+    @Published var authorizationStatus: CLAuthorizationStatus = .notDetermined
+    
+    override init() {
+        super.init()
+        locationManager.delegate = self
+        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+        authorizationStatus = locationManager.authorizationStatus
+    }
+    
+    func requestLocation() {
+        switch authorizationStatus {
+        case .notDetermined:
+            locationManager.requestWhenInUseAuthorization()
+        case .authorizedWhenInUse, .authorizedAlways:
+            locationManager.requestLocation()
+        default:
+            break
+        }
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
+        guard let location = locations.last else { return }
+        currentLocation = location
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
+        print("Location error: \(error.localizedDescription)")
+    }
+    
+    func locationManager(_ manager: CLLocationManager, didChangeAuthorization status: CLAuthorizationStatus) {
+        authorizationStatus = status
     }
 }
 

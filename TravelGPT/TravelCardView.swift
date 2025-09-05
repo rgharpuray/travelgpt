@@ -67,6 +67,44 @@ struct TravelCardView: View {
                 VStack {
                     Spacer()
                     
+                    // Mood tags (if any) - non-intrusive display
+                    if !card.moods.isEmpty {
+                        HStack {
+                            ScrollView(.horizontal, showsIndicators: false) {
+                                HStack(spacing: 6) {
+                                    ForEach(card.moods.prefix(3), id: \.self) { mood in
+                                        Text(mood)
+                                            .font(.caption2)
+                                            .fontWeight(.medium)
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, 8)
+                                            .padding(.vertical, 4)
+                                            .background(
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .fill(Color.black.opacity(0.6))
+                                            )
+                                    }
+                                    
+                                    if card.moods.count > 3 {
+                                        Text("+\(card.moods.count - 3)")
+                                            .font(.caption2)
+                                            .fontWeight(.medium)
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, 8)
+                                            .padding(.vertical, 4)
+                                            .background(
+                                                RoundedRectangle(cornerRadius: 8)
+                                                    .fill(Color.black.opacity(0.6))
+                                            )
+                                    }
+                                }
+                                .padding(.horizontal, 20)
+                            }
+                            Spacer()
+                        }
+                        .padding(.bottom, 8)
+                    }
+                    
                     // Collection tags (if any)
                     if let collectionTags = card.collection_tags, !collectionTags.isEmpty {
                         HStack {

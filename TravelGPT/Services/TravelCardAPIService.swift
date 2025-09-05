@@ -196,7 +196,7 @@ class TravelCardAPIService {
         }
     }
     
-    func getCards(category: String? = nil, location: String? = nil, search: String? = nil, page: Int = 1, pageSize: Int = 20) async throws -> PaginatedResponse<TravelCard> {
+    func getCards(category: String? = nil, location: String? = nil, search: String? = nil, moods: [String]? = nil, page: Int = 1, pageSize: Int = 20) async throws -> PaginatedResponse<TravelCard> {
         var urlComponents = URLComponents(string: "\(baseURL)/discovery/")!
         
         // Add query parameters based on backend documentation
@@ -209,6 +209,11 @@ class TravelCardAPIService {
         }
         if let search = search {
             queryItems.append(URLQueryItem(name: "se", value: search))
+        }
+        if let moods = moods, !moods.isEmpty {
+            // Add mood filtering - assuming backend accepts comma-separated moods
+            let moodString = moods.joined(separator: ",")
+            queryItems.append(URLQueryItem(name: "moods", value: moodString))
         }
         queryItems.append(URLQueryItem(name: "page", value: "\(page)"))
         queryItems.append(URLQueryItem(name: "page_size", value: "\(pageSize)"))
