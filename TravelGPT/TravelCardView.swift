@@ -23,9 +23,7 @@ struct TravelCardView: View {
                 )
                 .background(
                     RoundedRectangle(cornerRadius: 28)
-                        .fill(
-                            card.themeColor?.opacity(0.1) ?? card.rarityEnum?.color.opacity(0.05) ?? Color.gray.opacity(0.05)
-                        )
+                        .fill(Color.white)
                 )
                 .shadow(
                     color: card.themeColor?.opacity(0.3) ?? card.rarityEnum?.color.opacity(0.2) ?? Color.gray.opacity(0.1),
@@ -68,11 +66,11 @@ struct TravelCardView: View {
                     Spacer()
                     
                     // Mood tags (if any) - non-intrusive display
-                    if !card.moods.isEmpty {
+                    if !(card.moods ?? []).isEmpty {
                         HStack {
                             ScrollView(.horizontal, showsIndicators: false) {
                                 HStack(spacing: 6) {
-                                    ForEach(card.moods.prefix(3), id: \.self) { mood in
+                                    ForEach((card.moods ?? []).prefix(3), id: \.self) { mood in
                                         Text(mood)
                                             .font(.caption2)
                                             .fontWeight(.medium)
@@ -85,8 +83,8 @@ struct TravelCardView: View {
                                             )
                                     }
                                     
-                                    if card.moods.count > 3 {
-                                        Text("+\(card.moods.count - 3)")
+                                    if (card.moods ?? []).count > 3 {
+                                        Text("+\((card.moods ?? []).count - 3)")
                                             .font(.caption2)
                                             .fontWeight(.medium)
                                             .foregroundColor(.white)

@@ -20,26 +20,11 @@ struct TravelGPTApp: App {
     
     var body: some Scene {
         WindowGroup {
-            ContentView()
-                .environmentObject(CardStore())
-                .environmentObject(profileStore)
-                .environmentObject(subscriptionService)
-                .environmentObject(commentStore)
+            // Toki 2.0 - Lightweight Travel Logger
+            TokiHomeView()
                 .onAppear {
-                    // Ensure proper initialization on every app launch
-                    Task {
-                        await initializeApp()
-                    }
-                }
-                .onReceive(NotificationCenter.default.publisher(for: UIApplication.didBecomeActiveNotification)) { _ in
-                    // Check premium status when app becomes active
-                    Task {
-                        await subscriptionService.checkExistingPremiumStatus()
-                    }
-                }
-                .onReceive(NotificationCenter.default.publisher(for: UIApplication.willResignActiveNotification)) { _ in
-                    // Optional: Save any pending premium status changes
-                    print("App will resign active - premium status is current")
+                    // Request location permissions
+                    TokiLocationService.shared.requestAuthorization()
                 }
                 .onOpenURL { url in
                     handleDeepLink(url: url)

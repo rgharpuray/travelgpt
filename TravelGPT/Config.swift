@@ -45,4 +45,11 @@ struct Config {
     // MARK: - Debug Configuration
     static let enableAPILogging = true
     static let enableNetworkLogging = true
+    
+    // MARK: - OpenAI Configuration
+    static let openAIBaseURL = "https://api.openai.com/v1"
+    static let openAIModel = "gpt-4o-mini" // Using mini for cost efficiency
+    
+    // MARK: - Google Maps Configuration
+    static let googlePlacesBaseURL = "https://maps.googleapis.com/maps/api/place"
 }

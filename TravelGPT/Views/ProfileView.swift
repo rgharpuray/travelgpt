@@ -505,21 +505,24 @@ struct ProfileView: View {
                     // 3. Collections Section
                     collectionsSection
                     
-                    // 4. Account Section
+                    // 4. Wishlist Section
+                    wishlistSection
+                    
+                    // 5. Account Section
                     accountSection
                     
-                    // 5. Premium Upsell Card (only for non-premium)
+                    // 6. Premium Upsell Card (only for non-premium)
                     if !authService.isPremium {
                         premiumSection
                     }
                     
-                    // 6. Privacy & Safety Section
+                    // 7. Privacy & Safety Section
                     privacySection
                     
-                    // 7. Legal Section
+                    // 8. Legal Section
                     legalSection
                     
-                    // 8. Help & Tutorial Section
+                    // 9. Help & Tutorial Section
                     helpTutorialSection
                     
                     // Debug Section (for development)
@@ -764,6 +767,31 @@ struct ProfileView: View {
                 }
                 .padding(.horizontal, -20)
             }
+        }
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
+        .background(Color(.systemBackground))
+    }
+    
+    // MARK: - Wishlist Section
+    @ViewBuilder
+    private var wishlistSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack {
+                Text("My Wishlist")
+                    .font(.headline)
+                    .foregroundColor(.primary)
+                Spacer()
+                
+                NavigationLink(destination: WishlistProfileView()) {
+                    Text("View All")
+                        .font(.footnote)
+                        .foregroundColor(.blue)
+                }
+            }
+            
+            // Quick wishlist preview
+            WishlistPreviewView()
         }
         .padding(.horizontal, 20)
         .padding(.vertical, 12)

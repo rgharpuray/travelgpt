@@ -54,234 +54,533 @@ struct ContentView: View {
     @State private var cardCreationErrorMessage: String? = nil
     @State private var showMapView = false
     @State private var showLocationPicker = false
-    @State private var currentLocation = "Barcelona, Spain"
+    @State private var currentLocation = "Tokyo, Japan"
     @State private var selectedCategory = "all"
     @State private var selectedMood: TravelMood? = nil
     @State private var searchText = ""
     @State private var showAddCardSheet = false
     @State private var showCardCreationForm = false
     
-    // Sample cards with categories for filtering
+    // Sample cards with categories for filtering - Tokyo and Seattle focused
     private let sampleCards = [
+        // TOKYO CARDS
         TravelCard(
             id: 1,
-            destination_name: "Montserrat, Barcelona",
-            image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop",
+            destination_name: "Senso-ji Temple, Asakusa",
+            image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&h=600&fit=crop",
             is_valid_destination: true,
-            thought: "Great hike up to the monastery. The views of Catalonia from the top are impressive - you can see all the way to the Mediterranean.",
+            thought: "Tokyo's oldest temple with the iconic red lantern gate. The atmosphere is electric with traditional shops, fortune telling, and the constant hum of visitors. The temple grounds are massive and you can easily spend hours exploring.",
             created_at: "2025-01-15T10:30:00Z",
-            updated_at: nil,
-            like_count: 89,
-            is_liked: false,
-            is_owner: true,
-            is_intrusive_mode: false,
-            device_destination_name: "Montserrat",
-            owner_destination_name: "Montserrat",
-            rarity: "epic",
-            collection_tags: ["Barcelona Mountains"],
-            category: "Activities",
-            isVerified: true,
-            checkInPhotos: [
-                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400", userName: "Carlos", caption: "Incredible hike to the top!"),
-                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Maria", caption: "The monastery is magical"),
-                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=400", userName: "Javier", caption: "Best views in Catalonia!")
-            ],
-            s3_url: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop",
-            location: "Barcelona, Spain",
-            coordinates: "41.5917,1.8353",
-            admin_review_status: "approved",
-            admin_reviewer_id: 1,
-            admin_reviewed_at: "2025-01-15T11:00:00Z",
-            admin_notes: "Great photo and description",
-            check_in_count: 15,
-            comment_count: 8,
-            is_liked_by_user: false,
-            is_checked_in_by_user: false,
-            moods: ["Adventure", "Nature", "Excited"],
-            user: UserResponse(id: 1, username: "traveler123", first_name: "John", last_name: "Doe", email: "john@example.com"),
-            theme_color: "#4ECDC4"
-        ),
-        TravelCard(
-            id: 2,
-            destination_name: "Montjuïc Olympic Stadium '92",
-            image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
-            is_valid_destination: true,
-            thought: "Standing in the Olympic Stadium where the '92 Games happened is impressive. You can feel the Olympic spirit that transformed Barcelona.",
-            created_at: "2025-01-14T15:45:00Z",
-            updated_at: nil,
-            like_count: 156,
-            is_liked: true,
-            is_owner: false,
-            is_intrusive_mode: false,
-            device_destination_name: "Montjuïc Olympic Stadium",
-            owner_destination_name: "Montjuïc Olympic Stadium",
-            rarity: "legendary",
-            collection_tags: ["Barcelona Olympics"],
-            category: "Activities",
-            isVerified: true,
-            checkInPhotos: [
-                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Ana", caption: "Olympic history right here!"),
-                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400", userName: "Pablo", caption: "The stadium is massive")
-            ],
-            s3_url: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
-            location: "Barcelona, Spain",
-            coordinates: "41.3633,2.1522",
-            admin_review_status: "approved",
-            admin_reviewer_id: 1,
-            admin_reviewed_at: "2025-01-14T16:00:00Z",
-            admin_notes: "Excellent historical content",
-            check_in_count: 23,
-            comment_count: 12,
-            is_liked_by_user: true,
-            is_checked_in_by_user: false,
-            moods: ["History", "Sports", "Energetic"],
-            user: UserResponse(id: 2, username: "olympicfan", first_name: "Sarah", last_name: "Smith", email: "sarah@example.com"),
-            theme_color: "#FF6B6B"
-        ),
-        TravelCard(
-            id: 3,
-            destination_name: "La Tomatina Festival, Buñol",
-            image: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&h=600&fit=crop",
-            is_valid_destination: true,
-            thought: "The world's biggest food fight is as chaotic and fun as it sounds. Getting pelted with tomatoes while thousands of people laugh and dance - it's pure Spanish fun.",
-            created_at: "2025-01-13T19:20:00Z",
             updated_at: nil,
             like_count: 234,
             is_liked: false,
-            is_owner: false,
-            is_intrusive_mode: true,
-            device_destination_name: "La Tomatina",
-            owner_destination_name: "La Tomatina",
-            rarity: "legendary",
-            collection_tags: ["Spanish Festivals"],
-            category: "Activities",
+            is_owner: true,
+            is_intrusive_mode: false,
+            device_destination_name: "Senso-ji Temple",
+            owner_destination_name: "Senso-ji Temple",
+            rarity: "epic",
+            collection_tags: ["Tokyo Temples", "Traditional"],
+            category: "Culture",
             isVerified: true,
             checkInPhotos: [
-                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=400", userName: "Sofia", caption: "Most fun I've ever had!"),
-                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Diego", caption: "Tomato stains everywhere!")
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400", userName: "Yuki", caption: "The red lantern is so iconic!"),
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Takeshi", caption: "Got my fortune told here"),
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=400", userName: "Mika", caption: "Best traditional shopping in Tokyo!")
+            ],
+            s3_url: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&h=600&fit=crop",
+            location: "Tokyo, Japan",
+            coordinates: "35.7148,139.7967",
+            admin_review_status: "approved",
+            admin_reviewer_id: 1,
+            admin_reviewed_at: "2025-01-15T11:00:00Z",
+            admin_notes: "Excellent cultural content",
+            check_in_count: 45,
+            comment_count: 23,
+            is_liked_by_user: false,
+            is_checked_in_by_user: false,
+            moods: ["Cultural", "Spiritual", "Traditional"],
+            user: UserResponse(id: 1, username: "tokyotraveler", first_name: "Yuki", last_name: "Tanaka", email: "yuki@example.com"),
+            theme_color: "#FF6B6B"
+        ),
+        TravelCard(
+            id: 2,
+            destination_name: "Shibuya Crossing",
+            image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&h=600&fit=crop",
+            is_valid_destination: true,
+            thought: "The world's busiest pedestrian crossing is pure Tokyo energy. Thousands of people crossing in all directions creates this incredible organized chaos. Best viewed from the Starbucks above or the Hachiko exit.",
+            created_at: "2025-01-14T15:45:00Z",
+            updated_at: nil,
+            like_count: 567,
+            is_liked: true,
+            is_owner: false,
+            is_intrusive_mode: false,
+            device_destination_name: "Shibuya Crossing",
+            owner_destination_name: "Shibuya Crossing",
+            rarity: "legendary",
+            collection_tags: ["Tokyo Landmarks", "Urban"],
+            category: "Landmarks",
+            isVerified: true,
+            checkInPhotos: [
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Alex", caption: "The energy here is incredible!"),
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400", userName: "Emma", caption: "Perfect spot for people watching")
+            ],
+            s3_url: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&h=600&fit=crop",
+            location: "Tokyo, Japan",
+            coordinates: "35.6598,139.7006",
+            admin_review_status: "approved",
+            admin_reviewer_id: 1,
+            admin_reviewed_at: "2025-01-14T16:00:00Z",
+            admin_notes: "Iconic Tokyo landmark",
+            check_in_count: 89,
+            comment_count: 34,
+            is_liked_by_user: true,
+            is_checked_in_by_user: false,
+            moods: ["Urban", "Energetic", "Iconic"],
+            user: UserResponse(id: 2, username: "tokyolover", first_name: "Alex", last_name: "Chen", email: "alex@example.com"),
+            theme_color: "#4ECDC4"
+        ),
+        TravelCard(
+            id: 3,
+            destination_name: "Tsukiji Outer Market",
+            image: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&h=600&fit=crop",
+            is_valid_destination: true,
+            thought: "The outer market is still buzzing with fresh seafood, street food, and traditional shops. The tuna auctions moved to Toyosu, but this place still has incredible energy and the best sushi breakfast you'll ever have.",
+            created_at: "2025-01-13T19:20:00Z",
+            updated_at: nil,
+            like_count: 189,
+            is_liked: false,
+            is_owner: false,
+            is_intrusive_mode: false,
+            device_destination_name: "Tsukiji Outer Market",
+            owner_destination_name: "Tsukiji Outer Market",
+            rarity: "rare",
+            collection_tags: ["Tokyo Food", "Markets"],
+            category: "Food",
+            isVerified: true,
+            checkInPhotos: [
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400", userName: "Hiroshi", caption: "Best sushi breakfast ever!"),
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Sakura", caption: "The market energy is amazing")
             ],
             s3_url: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&h=600&fit=crop",
-            location: "Buñol, Spain",
-            coordinates: "39.4183,-0.7903",
+            location: "Tokyo, Japan",
+            coordinates: "35.6654,139.7706",
             admin_review_status: "approved",
             admin_reviewer_id: 1,
             admin_reviewed_at: "2025-01-13T20:00:00Z",
-            admin_notes: "Fun festival content",
-            check_in_count: 45,
-            comment_count: 18,
+            admin_notes: "Great food content",
+            check_in_count: 67,
+            comment_count: 19,
             is_liked_by_user: false,
             is_checked_in_by_user: false,
-            moods: ["festival", "fun"],
-            user: UserResponse(id: 3, username: "festivallover", first_name: "Maria", last_name: "Garcia", email: "maria@example.com"),
-            theme_color: "#FF8E53"
+            moods: ["Foodie", "Traditional", "Excited"],
+            user: UserResponse(id: 3, username: "foodie_tokyo", first_name: "Hiroshi", last_name: "Yamamoto", email: "hiroshi@example.com"),
+            theme_color: "#FFB347"
         ),
         TravelCard(
             id: 4,
-            destination_name: "Sagrada Familia, Barcelona",
+            destination_name: "Tokyo Skytree",
+            image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
+            is_valid_destination: true,
+            thought: "Tokyo's tallest structure offers incredible 360-degree views of the entire city. On clear days you can see Mount Fuji in the distance. The observation decks are massive and the city looks like a living circuit board from up here.",
+            created_at: "2025-01-12T14:30:00Z",
+            updated_at: nil,
+            like_count: 312,
+            is_liked: false,
+            is_owner: true,
+            is_intrusive_mode: false,
+            device_destination_name: "Tokyo Skytree",
+            owner_destination_name: "Tokyo Skytree",
+            rarity: "epic",
+            collection_tags: ["Tokyo Landmarks", "Views"],
+            category: "Activities",
+            isVerified: true,
+            checkInPhotos: [
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400", userName: "Kenji", caption: "The view is absolutely breathtaking!"),
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Aiko", caption: "Saw Mount Fuji from here!")
+            ],
+            s3_url: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
+            location: "Tokyo, Japan",
+            coordinates: "35.7101,139.8107",
+            admin_review_status: "approved",
+            admin_reviewer_id: 1,
+            admin_reviewed_at: "2025-01-12T15:00:00Z",
+            admin_notes: "Excellent landmark content",
+            check_in_count: 78,
+            comment_count: 28,
+            is_liked_by_user: false,
+            is_checked_in_by_user: false,
+            moods: ["Awe", "Urban", "Excited"],
+            user: UserResponse(id: 4, username: "tokyo_views", first_name: "Kenji", last_name: "Sato", email: "kenji@example.com"),
+            theme_color: "#87CEEB"
+        ),
+        TravelCard(
+            id: 5,
+            destination_name: "Harajuku Takeshita Street",
+            image: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=800&h=600&fit=crop",
+            is_valid_destination: true,
+            thought: "The heart of Tokyo's youth culture and fashion. This narrow street is packed with quirky shops, crepe stands, and the most colorful characters you'll ever see. It's like stepping into a different world.",
+            created_at: "2025-01-11T16:45:00Z",
+            updated_at: nil,
+            like_count: 145,
+            is_liked: true,
+            is_owner: false,
+            is_intrusive_mode: false,
+            device_destination_name: "Harajuku Takeshita Street",
+            owner_destination_name: "Harajuku Takeshita Street",
+            rarity: "rare",
+            collection_tags: ["Tokyo Fashion", "Youth Culture"],
+            category: "Shopping",
+            isVerified: true,
+            checkInPhotos: [
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400", userName: "Mai", caption: "So many unique fashion finds!"),
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Rina", caption: "The crepes here are amazing")
+            ],
+            s3_url: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=800&h=600&fit=crop",
+            location: "Tokyo, Japan",
+            coordinates: "35.6702,139.7026",
+            admin_review_status: "approved",
+            admin_reviewer_id: 1,
+            admin_reviewed_at: "2025-01-11T17:00:00Z",
+            admin_notes: "Great youth culture content",
+            check_in_count: 56,
+            comment_count: 21,
+            is_liked_by_user: true,
+            is_checked_in_by_user: false,
+            moods: ["Fashion", "Youthful", "Creative"],
+            user: UserResponse(id: 5, username: "harajuku_style", first_name: "Mai", last_name: "Nakamura", email: "mai@example.com"),
+            theme_color: "#FF69B4"
+        ),
+        TravelCard(
+            id: 6,
+            destination_name: "Meiji Shrine",
+            image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
+            is_valid_destination: true,
+            thought: "A peaceful oasis in the heart of Tokyo. The massive torii gates and forested paths make you forget you're in one of the world's busiest cities. Perfect for morning meditation or escaping the urban chaos.",
+            created_at: "2025-01-10T08:15:00Z",
+            updated_at: nil,
+            like_count: 198,
+            is_liked: false,
+            is_owner: true,
+            is_intrusive_mode: false,
+            device_destination_name: "Meiji Shrine",
+            owner_destination_name: "Meiji Shrine",
+            rarity: "epic",
+            collection_tags: ["Tokyo Temples", "Nature"],
+            category: "Culture",
+            isVerified: true,
+            checkInPhotos: [
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Satoshi", caption: "So peaceful and beautiful!"),
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400", userName: "Yuki", caption: "The forest is magical")
+            ],
+            s3_url: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
+            location: "Tokyo, Japan",
+            coordinates: "35.6762,139.6993",
+            admin_review_status: "approved",
+            admin_reviewer_id: 1,
+            admin_reviewed_at: "2025-01-10T09:00:00Z",
+            admin_notes: "Great spiritual content",
+            check_in_count: 34,
+            comment_count: 16,
+            is_liked_by_user: false,
+            is_checked_in_by_user: false,
+            moods: ["Spiritual", "Peaceful", "Traditional"],
+            user: UserResponse(id: 6, username: "tokyo_zen", first_name: "Satoshi", last_name: "Ito", email: "satoshi@example.com"),
+            theme_color: "#228B22"
+        ),
+        TravelCard(
+            id: 7,
+            destination_name: "Tokyo National Museum",
+            image: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=800&h=600&fit=crop",
+            is_valid_destination: true,
+            thought: "Japan's oldest and largest museum houses incredible artifacts spanning thousands of years. The samurai armor, ancient pottery, and calligraphy collections are mind-blowing. You could spend days here.",
+            created_at: "2025-01-09T11:30:00Z",
+            updated_at: nil,
+            like_count: 123,
+            is_liked: false,
+            is_owner: false,
+            is_intrusive_mode: false,
+            device_destination_name: "Tokyo National Museum",
+            owner_destination_name: "Tokyo National Museum",
+            rarity: "rare",
+            collection_tags: ["Tokyo Museums", "History"],
+            category: "Culture",
+            isVerified: true,
+            checkInPhotos: [
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400", userName: "Akiko", caption: "The samurai armor is incredible!"),
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Taro", caption: "So much history in one place")
+            ],
+            s3_url: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=800&h=600&fit=crop",
+            location: "Tokyo, Japan",
+            coordinates: "35.7189,139.7756",
+            admin_review_status: "approved",
+            admin_reviewer_id: 1,
+            admin_reviewed_at: "2025-01-09T12:00:00Z",
+            admin_notes: "Excellent museum content",
+            check_in_count: 28,
+            comment_count: 14,
+            is_liked_by_user: false,
+            is_checked_in_by_user: false,
+            moods: ["Educational", "Cultural", "Fascinated"],
+            user: UserResponse(id: 7, username: "museum_lover", first_name: "Akiko", last_name: "Suzuki", email: "akiko@example.com"),
+            theme_color: "#8B4513"
+        ),
+        // SEATTLE CARDS
+        TravelCard(
+            id: 8,
+            destination_name: "Pike Place Market",
+            image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop",
+            is_valid_destination: true,
+            thought: "Seattle's iconic market is pure sensory overload in the best way. Fresh flowers, flying fish, local crafts, and the original Starbucks. The energy is infectious and you'll find something unique at every stall.",
+            created_at: "2025-01-08T14:20:00Z",
+            updated_at: nil,
+            like_count: 345,
+            is_liked: true,
+            is_owner: true,
+            is_intrusive_mode: false,
+            device_destination_name: "Pike Place Market",
+            owner_destination_name: "Pike Place Market",
+            rarity: "legendary",
+            collection_tags: ["Seattle Landmarks", "Markets"],
+            category: "Food",
+            isVerified: true,
+            checkInPhotos: [
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400", userName: "Jake", caption: "The fish throwing is amazing!"),
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Sarah", caption: "Best local crafts and food"),
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=400", userName: "Mike", caption: "The original Starbucks is here!")
+            ],
+            s3_url: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop",
+            location: "Seattle, WA",
+            coordinates: "47.6097,-122.3331",
+            admin_review_status: "approved",
+            admin_reviewer_id: 1,
+            admin_reviewed_at: "2025-01-08T15:00:00Z",
+            admin_notes: "Iconic Seattle landmark",
+            check_in_count: 67,
+            comment_count: 31,
+            is_liked_by_user: true,
+            is_checked_in_by_user: false,
+            moods: ["Foodie", "Energetic", "Local"],
+            user: UserResponse(id: 8, username: "seattle_local", first_name: "Jake", last_name: "Thompson", email: "jake@example.com"),
+            theme_color: "#FF6347"
+        ),
+        TravelCard(
+            id: 9,
+            destination_name: "Space Needle",
+            image: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
+            is_valid_destination: true,
+            thought: "Seattle's most iconic landmark offers incredible 360-degree views of the city, mountains, and water. The glass floor observation deck is thrilling, and on clear days you can see Mount Rainier in all its glory.",
+            created_at: "2025-01-07T16:45:00Z",
+            updated_at: nil,
+            like_count: 456,
+            is_liked: false,
+            is_owner: false,
+            is_intrusive_mode: false,
+            device_destination_name: "Space Needle",
+            owner_destination_name: "Space Needle",
+            rarity: "legendary",
+            collection_tags: ["Seattle Landmarks", "Views"],
+            category: "Activities",
+            isVerified: true,
+            checkInPhotos: [
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400", userName: "Emma", caption: "The glass floor is terrifying but amazing!"),
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "David", caption: "Saw Mount Rainier perfectly today!")
+            ],
+            s3_url: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=800&h=600&fit=crop",
+            location: "Seattle, WA",
+            coordinates: "47.6205,-122.3493",
+            admin_review_status: "approved",
+            admin_reviewer_id: 1,
+            admin_reviewed_at: "2025-01-07T17:00:00Z",
+            admin_notes: "Iconic Seattle landmark",
+            check_in_count: 89,
+            comment_count: 42,
+            is_liked_by_user: false,
+            is_checked_in_by_user: false,
+            moods: ["Awe", "Urban", "Excited"],
+            user: UserResponse(id: 9, username: "seattle_views", first_name: "Emma", last_name: "Johnson", email: "emma@example.com"),
+            theme_color: "#87CEEB"
+        ),
+        TravelCard(
+            id: 10,
+            destination_name: "Chihuly Garden and Glass",
+            image: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&h=600&fit=crop",
+            is_valid_destination: true,
+            thought: "Dale Chihuly's glass art is absolutely mesmerizing. The garden installation with the Space Needle backdrop is magical, especially at sunset. The indoor galleries showcase his incredible talent with color and form.",
+            created_at: "2025-01-06T18:30:00Z",
+            updated_at: nil,
+            like_count: 278,
+            is_liked: true,
+            is_owner: false,
+            is_intrusive_mode: false,
+            device_destination_name: "Chihuly Garden and Glass",
+            owner_destination_name: "Chihuly Garden and Glass",
+            rarity: "epic",
+            collection_tags: ["Seattle Art", "Glass"],
+            category: "Culture",
+            isVerified: true,
+            checkInPhotos: [
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400", userName: "Lisa", caption: "The glass sculptures are incredible!"),
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Tom", caption: "Perfect at sunset")
+            ],
+            s3_url: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=800&h=600&fit=crop",
+            location: "Seattle, WA",
+            coordinates: "47.6205,-122.3493",
+            admin_review_status: "approved",
+            admin_reviewer_id: 1,
+            admin_reviewed_at: "2025-01-06T19:00:00Z",
+            admin_notes: "Excellent art content",
+            check_in_count: 45,
+            comment_count: 22,
+            is_liked_by_user: true,
+            is_checked_in_by_user: false,
+            moods: ["Artistic", "Inspired", "Peaceful"],
+            user: UserResponse(id: 10, username: "art_lover", first_name: "Lisa", last_name: "Williams", email: "lisa@example.com"),
+            theme_color: "#9370DB"
+        ),
+        TravelCard(
+            id: 11,
+            destination_name: "Kerry Park",
+            image: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&h=600&fit=crop",
+            is_valid_destination: true,
+            thought: "The best view of Seattle's skyline with the Space Needle and Mount Rainier in the background. This small park on Queen Anne Hill is perfect for sunset photos and taking in the city's beauty.",
+            created_at: "2025-01-05T19:15:00Z",
+            updated_at: nil,
+            like_count: 189,
+            is_liked: false,
+            is_owner: true,
+            is_intrusive_mode: false,
+            device_destination_name: "Kerry Park",
+            owner_destination_name: "Kerry Park",
+            rarity: "rare",
+            collection_tags: ["Seattle Views", "Parks"],
+            category: "Activities",
+            isVerified: true,
+            checkInPhotos: [
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400", userName: "Ryan", caption: "Best view of Seattle!"),
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Jessica", caption: "Perfect for sunset photos")
+            ],
+            s3_url: "https://images.unsplash.com/photo-1530103862676-de8c9debad1d?w=800&h=600&fit=crop",
+            location: "Seattle, WA",
+            coordinates: "47.6284,-122.3568",
+            admin_review_status: "approved",
+            admin_reviewer_id: 1,
+            admin_reviewed_at: "2025-01-05T20:00:00Z",
+            admin_notes: "Great viewpoint content",
+            check_in_count: 34,
+            comment_count: 17,
+            is_liked_by_user: false,
+            is_checked_in_by_user: false,
+            moods: ["Peaceful", "Scenic", "Photography"],
+            user: UserResponse(id: 11, username: "seattle_photographer", first_name: "Ryan", last_name: "Davis", email: "ryan@example.com"),
+            theme_color: "#32CD32"
+        ),
+        TravelCard(
+            id: 4,
+            destination_name: "Fremont Troll",
             image: "https://images.unsplash.com/photo-1589308078059-be1415eab4c3?w=800&h=600&fit=crop",
             is_valid_destination: true,
-            thought: "Gaudí's masterpiece is impressive. The stained glass creates a beautiful cathedral effect that makes you feel like you're inside a living work of art.",
+            thought: "Seattle's quirky public art under the Aurora Bridge is pure Fremont charm. The massive concrete troll clutching a real VW Beetle is both whimsical and impressive. Perfect for quirky photos!",
             created_at: "2025-01-12T18:00:00Z",
             updated_at: nil,
             like_count: 312,
             is_liked: true,
             is_owner: false,
             is_intrusive_mode: false,
-            device_destination_name: "Sagrada Familia",
-            owner_destination_name: "Sagrada Familia",
-            rarity: "legendary",
-            collection_tags: ["Barcelona Architecture"],
-            category: "Museums",
+            device_destination_name: "Fremont Troll",
+            owner_destination_name: "Fremont Troll",
+            rarity: "rare",
+            collection_tags: ["Seattle Art", "Quirky"],
+            category: "Culture",
             isVerified: true,
             checkInPhotos: [
-                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=400", userName: "Elena", caption: "The light inside is magical"),
-                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Miguel", caption: "Gaudí was a genius!")
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400", userName: "Amanda", caption: "So quirky and fun!"),
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Chris", caption: "The VW Beetle detail is amazing")
             ],
             s3_url: "https://images.unsplash.com/photo-1589308078059-be1415eab4c3?w=800&h=600&fit=crop",
-            location: "Barcelona, Spain",
-            coordinates: "41.4036,2.1744",
+            location: "Seattle, WA",
+            coordinates: "47.6509,-122.3473",
             admin_review_status: "approved",
             admin_reviewer_id: 1,
             admin_reviewed_at: "2025-01-12T19:00:00Z",
-            admin_notes: "Beautiful architectural content",
-            check_in_count: 67,
-            comment_count: 25,
+            admin_notes: "Quirky art content",
+            check_in_count: 28,
+            comment_count: 13,
             is_liked_by_user: true,
             is_checked_in_by_user: false,
-            moods: ["architecture", "culture"],
-            user: UserResponse(id: 4, username: "architectfan", first_name: "Carlos", last_name: "Lopez", email: "carlos@example.com")
+            moods: ["Quirky", "Artistic", "Fun"],
+            user: UserResponse(id: 12, username: "fremont_explorer", first_name: "Amanda", last_name: "Brown", email: "amanda@example.com")
         ),
         TravelCard(
             id: 5,
-            destination_name: "La Boqueria Market, Barcelona",
+            destination_name: "Museum of Pop Culture (MoPOP)",
             image: "https://lp-cms-production.imgix.net/2025-02/shutterstock1238252371.jpg?auto=format,compress&q=72&w=1440&h=810&fit=crop",
             is_valid_destination: true,
-            thought: "This market is great for food lovers. Fresh seafood, colorful fruits, and the best jamón ibérico. The energy and smells make you want to try everything.",
+            thought: "Frank Gehry's architectural masterpiece houses incredible music, sci-fi, and gaming exhibits. The Nirvana and Pearl Jam sections are amazing, and the sci-fi collection is out of this world. Perfect for music and pop culture lovers.",
             created_at: "2025-01-11T14:30:00Z",
             updated_at: nil,
             like_count: 178,
             is_liked: false,
             is_owner: false,
             is_intrusive_mode: false,
-            device_destination_name: "La Boqueria",
-            owner_destination_name: "La Boqueria",
-            rarity: "rare",
-            collection_tags: ["Barcelona Food"],
-            category: "Restaurants",
+            device_destination_name: "Museum of Pop Culture",
+            owner_destination_name: "Museum of Pop Culture",
+            rarity: "epic",
+            collection_tags: ["Seattle Museums", "Music"],
+            category: "Culture",
             isVerified: true,
             checkInPhotos: [
-                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Carmen", caption: "Best tapas in the city!"),
-                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1540959733332-eab4deabeeaf?w=400", userName: "Luis", caption: "Fresh seafood everywhere")
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400", userName: "Kevin", caption: "The Nirvana exhibit is incredible!"),
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Rachel", caption: "The sci-fi collection is amazing")
             ],
             s3_url: "https://lp-cms-production.imgix.net/2025-02/shutterstock1238252371.jpg?auto=format,compress&q=72&w=1440&h=810&fit=crop",
-            location: "Barcelona, Spain",
-            coordinates: "41.3819,2.1716",
+            location: "Seattle, WA",
+            coordinates: "47.6205,-122.3493",
             admin_review_status: "approved",
             admin_reviewer_id: 1,
             admin_reviewed_at: "2025-01-11T15:00:00Z",
-            admin_notes: "Great food market content",
-            check_in_count: 34,
-            comment_count: 15,
+            admin_notes: "Excellent museum content",
+            check_in_count: 52,
+            comment_count: 25,
             is_liked_by_user: false,
             is_checked_in_by_user: false,
-            moods: ["food", "culture"],
-            user: UserResponse(id: 5, username: "foodie", first_name: "Isabella", last_name: "Martinez", email: "isabella@example.com")
+            moods: ["Music", "Cultural", "Inspired"],
+            user: UserResponse(id: 13, username: "music_lover", first_name: "Kevin", last_name: "Miller", email: "kevin@example.com")
         ),
         TravelCard(
             id: 6,
-            destination_name: "Park Güell, Barcelona",
+            destination_name: "Discovery Park",
             image: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop",
             is_valid_destination: true,
-            thought: "Walking through Park Güell feels like stepping into a fairy tale. The mosaic benches, dragon fountain, and whimsical architecture are impressive.",
+            thought: "Seattle's largest park offers incredible views of Puget Sound and the Olympic Mountains. The lighthouse, beaches, and forest trails make it perfect for hiking and nature photography. A true urban wilderness escape.",
             created_at: "2025-01-10T12:00:00Z",
             updated_at: nil,
             like_count: 245,
             is_liked: true,
             is_owner: false,
             is_intrusive_mode: false,
-            device_destination_name: "Park Güell",
-            owner_destination_name: "Park Güell",
+            device_destination_name: "Discovery Park",
+            owner_destination_name: "Discovery Park",
             rarity: "epic",
-            collection_tags: ["Barcelona Parks"],
+            collection_tags: ["Seattle Parks", "Nature"],
             category: "Activities",
             isVerified: true,
             checkInPhotos: [
-                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Antonio", caption: "The mosaics are incredible!"),
-                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1542051841857-5f90071e7989?w=400", userName: "Lucia", caption: "Perfect for a sunny day")
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=400", userName: "Mark", caption: "The lighthouse view is amazing!"),
+                CheckInPhoto(id: UUID(), imageUrl: "https://images.unsplash.com/photo-1545569341-9eb8b30979d9?w=400", userName: "Jennifer", caption: "Perfect for nature photography")
             ],
             s3_url: "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&h=600&fit=crop",
-            location: "Barcelona, Spain",
-            coordinates: "41.4145,2.1527",
+            location: "Seattle, WA",
+            coordinates: "47.6614,-122.4065",
             admin_review_status: "approved",
             admin_reviewer_id: 1,
             admin_reviewed_at: "2025-01-10T13:00:00Z",
-            admin_notes: "Beautiful park content",
-            check_in_count: 56,
-            comment_count: 22,
+            admin_notes: "Great nature content",
+            check_in_count: 42,
+            comment_count: 18,
             is_liked_by_user: true,
             is_checked_in_by_user: false,
-            moods: ["nature", "architecture"],
-            user: UserResponse(id: 6, username: "parklover", first_name: "David", last_name: "Rodriguez", email: "david@example.com")
+            moods: ["Nature", "Peaceful", "Scenic"],
+            user: UserResponse(id: 14, username: "nature_lover", first_name: "Mark", last_name: "Wilson", email: "mark@example.com")
         )
     ]
     
@@ -470,7 +769,7 @@ struct ContentView: View {
                 ScrollView {
                     LazyVStack(spacing: 20) {
                         ForEach(filteredCards) { card in
-                            SimpleTravelCardView(card: card)
+                            SimpleTravelCardView(card: card, cardStore: cardStore)
                         }
                         
                         if filteredCards.isEmpty {
@@ -630,15 +929,17 @@ struct ContentView: View {
 
 struct SimpleTravelCardView: View {
     let card: TravelCard
+    @ObservedObject var cardStore: CardStore
     @State var isLiked: Bool
     @State var likeCount: Int
     @State private var showCheckInSheet = false
     @State private var showPhotoGallery = false
     
-    init(card: TravelCard) {
+    init(card: TravelCard, cardStore: CardStore) {
         self.card = card
+        self.cardStore = cardStore
         _isLiked = State(initialValue: card.is_liked)
-        _likeCount = State(initialValue: card.like_count)
+        _likeCount = State(initialValue: card.like_count ?? 0)
     }
     
     var body: some View {
@@ -667,9 +968,9 @@ struct SimpleTravelCardView: View {
                     }
                     
                     // Mood tags - non-intrusive display
-                    if !card.moods.isEmpty {
+                    if !(card.moods ?? []).isEmpty {
                         HStack(spacing: 6) {
-                            ForEach(card.moods.prefix(3), id: \.self) { mood in
+                            ForEach((card.moods ?? []).prefix(3), id: \.self) { mood in
                                 Text(mood)
                                     .font(.caption2)
                                     .fontWeight(.medium)
@@ -682,8 +983,8 @@ struct SimpleTravelCardView: View {
                                     )
                             }
                             
-                            if card.moods.count > 3 {
-                                Text("+\(card.moods.count - 3)")
+                            if (card.moods ?? []).count > 3 {
+                                Text("+\((card.moods ?? []).count - 3)")
                                     .font(.caption2)
                                     .fontWeight(.medium)
                                     .foregroundColor(.secondary)
@@ -751,67 +1052,78 @@ struct SimpleTravelCardView: View {
                     .padding(.horizontal, 20)
                 }
                 
-                // Action bar
-                HStack(spacing: 20) {
-                    // Check-in button
-                    Button(action: {
-                        showCheckInSheet = true
-                    }) {
-                        HStack(spacing: 6) {
-                            Image(systemName: "camera.fill")
-                                .font(.caption)
-                            Text("Check In")
-                                .font(.caption)
-                                .fontWeight(.medium)
+                // Action bar - Two rows
+                VStack(spacing: 12) {
+                    // First row: Wishlist and Check-in buttons
+                    HStack(spacing: 12) {
+                        // Wishlist button
+                        WishlistButtonsView(card: card, cardStore: cardStore)
+                        
+                        // Check-in button
+                        Button(action: {
+                            showCheckInSheet = true
+                        }) {
+                            HStack(spacing: 6) {
+                                Image(systemName: "camera.fill")
+                                    .font(.caption)
+                                Text("Check In")
+                                    .font(.caption)
+                                    .fontWeight(.medium)
+                            }
+                            .foregroundColor(.white)
+                            .padding(.horizontal, 20)
+                            .padding(.vertical, 10)
+                            .background(Color.black)
+                            .cornerRadius(12)
                         }
-                        .foregroundColor(.white)
-                        .padding(.horizontal, 12)
-                        .padding(.vertical, 6)
-                        .background(Color.black)
-                        .cornerRadius(12)
+                        
+                        Spacer()
                     }
                     
-                    // Like button
-                    Button(action: {
-                        withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
-                            isLiked.toggle()
-                            likeCount += isLiked ? 1 : -1
+                    // Second row: Interaction buttons (like, comments, share)
+                    HStack(spacing: 16) {
+                        // Like button
+                        Button(action: {
+                            withAnimation(.spring(response: 0.3, dampingFraction: 0.6)) {
+                                isLiked.toggle()
+                                likeCount += isLiked ? 1 : -1
+                            }
+                        }) {
+                            HStack(spacing: 4) {
+                                Image(systemName: isLiked ? "heart.fill" : "heart")
+                                    .foregroundColor(isLiked ? .red : .gray)
+                                Text("\(likeCount)")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
                         }
-                    }) {
-                        HStack(spacing: 4) {
-                            Image(systemName: isLiked ? "heart.fill" : "heart")
-                                .foregroundColor(isLiked ? .red : .gray)
-                            Text("\(likeCount)")
-                                .font(.caption)
+                        
+                        // Comments button
+                        Button(action: {}) {
+                            HStack(spacing: 4) {
+                                Image(systemName: "bubble.left")
+                                    .foregroundColor(.gray)
+                                Text("\(card.checkInPhotos.count)")
+                                    .font(.caption)
+                                    .foregroundColor(.gray)
+                            }
+                        }
+                        
+                        // Share button
+                        Button(action: {}) {
+                            Image(systemName: "square.and.arrow.up")
                                 .foregroundColor(.gray)
                         }
-                    }
-                    
-                    // Comments button
-                    Button(action: {}) {
-                        HStack(spacing: 4) {
-                            Image(systemName: "bubble.left")
-                                .foregroundColor(.gray)
-                            Text("\(card.checkInPhotos.count)")
-                                .font(.caption)
-                                .foregroundColor(.gray)
-                        }
-                    }
-                    
-                    Spacer()
-                    
-                    // Share button
-                    Button(action: {}) {
-                        Image(systemName: "square.and.arrow.up")
-                            .foregroundColor(.gray)
+                        
+                        Spacer()
                     }
                 }
                 .padding(.horizontal, 20)
                 .padding(.bottom, 20)
             }
-            .background(card.themeColor?.opacity(0.1) ?? Color.white)
+            .background(Color.white)
         }
-        .background(card.themeColor?.opacity(0.1) ?? Color.white)
+        .background(Color.white)
         .cornerRadius(16)
         .shadow(color: card.themeColor?.opacity(0.2) ?? Color.black.opacity(0.1), radius: 10, x: 0, y: 5)
         .sheet(isPresented: $showCheckInSheet) {

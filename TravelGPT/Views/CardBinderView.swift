@@ -190,7 +190,9 @@ struct CardBinderView: View {
             }
             
             // If same rarity, sort by creation date (newest first)
-            return card1.created_at > card2.created_at
+            let date1 = card1.created_at ?? ""
+            let date2 = card2.created_at ?? ""
+            return date1 > date2
         } : cardStore.cards
         
         let startIndex = currentPage * cardsPerPage

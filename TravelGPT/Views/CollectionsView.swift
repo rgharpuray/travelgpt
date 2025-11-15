@@ -297,7 +297,7 @@ struct CollectionDetailContentView: View {
                 ScrollView {
                     LazyVStack(spacing: 0) {
                         ForEach(cards) { card in
-                            SimpleTravelCardView(card: card)
+                            SimpleTravelCardView(card: card, cardStore: cardStore)
                                 .environmentObject(cardStore)
                                 .environmentObject(profileStore)
                                 .environmentObject(commentStore)

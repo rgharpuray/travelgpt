@@ -7,13 +7,13 @@ struct TravelCard: Identifiable, Codable {
     let destination_name: String?
     let image: String
     let thought: String?
-    let created_at: String
+    let created_at: String?
     let updated_at: String?
-    var like_count: Int
-    var check_in_count: Int
-    var comment_count: Int
-    var is_liked_by_user: Bool
-    var is_checked_in_by_user: Bool
+    var like_count: Int?
+    var check_in_count: Int?
+    var comment_count: Int?
+    var is_liked_by_user: Bool?
+    var is_checked_in_by_user: Bool?
     let category: String?
     let s3_url: String?
     let location: String?
@@ -21,14 +21,20 @@ struct TravelCard: Identifiable, Codable {
     let admin_review_status: String?
     let user: UserResponse?
     let device_id: String?
-    let moods: [String]
+    let moods: [String]?
     let theme_color: String?
+    var is_in_wishlist: Bool?
+    var wishlist_priority: String?
+    let ai_insights: String?
+    let color_theme: String?
+    let is_verified: Bool?
+    
     
     
     // Computed properties for backward compatibility
     var is_valid_destination: Bool { true }
     var is_liked: Bool { 
-        get { is_liked_by_user }
+        get { is_liked_by_user ?? false }
         set { is_liked_by_user = newValue }
     }
     var is_owner: Bool { false } // TODO: Implement when user system is ready
@@ -40,7 +46,15 @@ struct TravelCard: Identifiable, Codable {
     var isVerified: Bool { admin_review_status == "approved" }
     var checkInPhotos: [CheckInPhoto] { [] }
     
+    // Wishlist computed properties
+    var isInWishlist: Bool { is_in_wishlist ?? false }
+    var wishlistPriority: WishlistPriority? {
+        guard let priorityString = wishlist_priority else { return nil }
+        return WishlistPriority(rawValue: priorityString)
+    }
+    
     var formattedDate: String {
+        guard let created_at = created_at else { return "Unknown date" }
         let formatter = DateFormatter()
         formatter.dateFormat = "yyyy-MM-dd'T'HH:mm:ssZ"
         if let date = formatter.date(from: created_at) {
@@ -67,16 +81,24 @@ struct TravelCard: Identifiable, Codable {
         return Color(hex: colorString)
     }
     
+    // Computed properties for backward compatibility with counts
+    var likeCount: Int { like_count ?? 0 }
+    var checkInCount: Int { check_in_count ?? 0 }
+    var commentCount: Int { comment_count ?? 0 }
+    var moodsArray: [String] { moods ?? [] }
+    
     // Custom initializer for backward compatibility with existing code
     init(id: Int, destination_name: String?, image: String, is_valid_destination: Bool, thought: String?, 
-         created_at: String, updated_at: String?, like_count: Int, is_liked: Bool, is_owner: Bool?, 
+         created_at: String?, updated_at: String?, like_count: Int?, is_liked: Bool, is_owner: Bool?, 
          is_intrusive_mode: Bool?, device_destination_name: String?, owner_destination_name: String?, 
          rarity: String?, collection_tags: [String]?, category: String?, isVerified: Bool, 
          checkInPhotos: [CheckInPhoto] = [], s3_url: String? = nil, location: String? = nil, 
          coordinates: String? = nil, admin_review_status: String? = nil, admin_reviewer_id: Int? = nil, 
          admin_reviewed_at: String? = nil, admin_notes: String? = nil, check_in_count: Int? = nil, 
          comment_count: Int? = nil, is_liked_by_user: Bool? = nil, is_checked_in_by_user: Bool? = nil, 
-         moods: [String]? = nil, user: UserResponse? = nil, device_id: String? = nil, theme_color: String? = nil) {
+         moods: [String]? = nil, user: UserResponse? = nil, device_id: String? = nil, theme_color: String? = nil,
+         is_in_wishlist: Bool? = nil, wishlist_priority: String? = nil, ai_insights: String? = nil,
+         color_theme: String? = nil, is_verified: Bool? = nil) {
         self.id = id
         self.destination_name = destination_name
         self.image = image
@@ -84,10 +106,10 @@ struct TravelCard: Identifiable, Codable {
         self.created_at = created_at
         self.updated_at = updated_at
         self.like_count = like_count
-        self.check_in_count = check_in_count ?? 0
-        self.comment_count = comment_count ?? 0
+        self.check_in_count = check_in_count
+        self.comment_count = comment_count
         self.is_liked_by_user = is_liked_by_user ?? is_liked
-        self.is_checked_in_by_user = is_checked_in_by_user ?? false
+        self.is_checked_in_by_user = is_checked_in_by_user
         self.category = category
         self.s3_url = s3_url
         self.location = location
@@ -95,8 +117,13 @@ struct TravelCard: Identifiable, Codable {
         self.admin_review_status = admin_review_status
         self.user = user
         self.device_id = device_id
-        self.moods = moods ?? []
+        self.moods = moods
         self.theme_color = theme_color
+        self.is_in_wishlist = is_in_wishlist
+        self.wishlist_priority = wishlist_priority
+        self.ai_insights = ai_insights
+        self.color_theme = color_theme
+        self.is_verified = is_verified
     }
 }
 
@@ -142,7 +169,7 @@ class CardStore: ObservableObject {
     @Published var feedType: FeedType = .all
     @Published var isIntrusiveMode: Bool = false
     @Published var selectedMoods: [String] = []
-    @Published var selectedLocation: String = "Barcelona, Spain"
+    @Published var selectedLocation: String = "Miyajima, Japan"
     
     var filteredCards: [TravelCard] {
         cards.filter { $0.is_intrusive_mode == isIntrusiveMode }
@@ -370,6 +397,14 @@ class CardStore: ObservableObject {
     func updateCard(_ card: TravelCard) {
         if let index = cards.firstIndex(where: { $0.id == card.id }) {
             cards[index] = card
+            saveCards()
+        }
+    }
+    
+    func updateCardWishlistStatus(cardId: Int, isInWishlist: Bool, priority: WishlistPriority?) {
+        if let index = cards.firstIndex(where: { $0.id == cardId }) {
+            cards[index].is_in_wishlist = isInWishlist
+            cards[index].wishlist_priority = priority?.rawValue
             saveCards()
         }
     }
@@ -606,4 +641,79 @@ struct AdminStatsResponse: Codable {
     let rejected_cards: Int
     let cards_today: Int
     let average_review_time_hours: Double
+}
+
+// MARK: - Wishlist Models
+
+struct WishlistEntry: Identifiable, Codable {
+    let id: Int
+    let card: TravelCard
+    let user: UserResponse?
+    let device_id: String?
+    let priority: WishlistPriority
+    let notes: String?
+    let created_at: String
+    let updated_at: String?
+    
+    // Custom initializer for creating entries manually
+    init(id: Int, card: TravelCard, user: UserResponse?, device_id: String?, priority: WishlistPriority, notes: String?, created_at: String, updated_at: String?) {
+        self.id = id
+        self.card = card
+        self.user = user
+        self.device_id = device_id
+        self.priority = priority
+        self.notes = notes
+        self.created_at = created_at
+        self.updated_at = updated_at
+    }
+}
+
+enum WishlistPriority: String, CaseIterable, Codable {
+    case mustDo = "must_do"
+    case soundsFun = "sounds_fun"
+    case maybe = "maybe"
+    
+    var displayName: String {
+        switch self {
+        case .mustDo: return "Must Do"
+        case .soundsFun: return "Sounds Fun"
+        case .maybe: return "Maybe"
+        }
+    }
+    
+    var icon: String {
+        switch self {
+        case .mustDo: return "star.fill"
+        case .soundsFun: return "heart.fill"
+        case .maybe: return "bookmark.fill"
+        }
+    }
+    
+    var color: Color {
+        switch self {
+        case .mustDo: return .red
+        case .soundsFun: return .orange
+        case .maybe: return .blue
+        }
+    }
+}
+
+struct AddToWishlistRequest: Codable {
+    let card_id: Int
+    let priority: WishlistPriority
+    let notes: String?
+}
+
+struct UpdateWishlistRequest: Codable {
+    let priority: WishlistPriority?
+    let notes: String?
+}
+
+struct UpdateWishlistResponse: Codable {
+    let priority: WishlistPriority
+    let notes: String?
+}
+
+struct RemoveFromWishlistRequest: Codable {
+    let card_id: Int
 } 
