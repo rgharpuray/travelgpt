@@ -7,12 +7,10 @@ class TokiAIService {
     
     private let keychain = KeychainManager.shared
     
-    // PROOF OF CONCEPT: Hardcoded API key
-    
     private init() {}
     
     private func getAPIKey() -> String? {
-        // PROOF OF CONCEPT: Use hardcoded key first, fallback to keychain
+        return keychain.getOpenAIKey()
     }
     
     // MARK: - Destination Suggestions
